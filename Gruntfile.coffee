@@ -23,10 +23,12 @@ module.exports = (grunt) ->
 				]
 			
 		concat:
-			relase:
-				files:
-					'<%= config.release_dir %>/game/game.js' : ['<%= config.build_dir %>/game/**/*.js']
-					'<%= config.release_dir %>/server/server.js' : ['<%= config.build_dir %>/server/**/*.js']
+			game:
+				src: ['<%= config.build_dir %>/game/**/modules.js', '<%= config.build_dir %>/game/**/*.js']
+				dest: '<%= config.release_dir %>/game/game.js'
+			server:
+				src: ['<%= config.build_dir %>/server/**/*.js']
+				dest: '<%= config.release_dir %>/server/server.js'
 
 	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-coffee')
