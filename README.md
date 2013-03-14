@@ -2,6 +2,7 @@ html5-arkanoid
 ==============
 
 Installation steps:
+
 1. Install node.js (with npm).
 2. [optional] Install grunt globally (npm install -g grunt).
 3. Clone repository.
