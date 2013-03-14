@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Smartphone controlled Arkanoid in HTML5.",
   "main": "index.js",
+  "scripts": {
+    "test": "grunt"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/jsikorski/html5-arkanoid"
