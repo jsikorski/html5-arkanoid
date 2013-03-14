@@ -1,6 +1,4 @@
-module 'Arkanoid'
-
-class Arkanoid.Game
+class Game
 	constructor: ->
 		@pad = new Arkanoid.Models.Pad()
 		@ball = new Arkanoid.Models.Ball()
@@ -21,7 +19,7 @@ class Arkanoid.Game
 		document.body.appendChild(canvas)
 
 	initGraphics: ->
-		background = new Arkanoid.Models.Background()
+		background = new Arkanoid.Models.Model()
 		@renderer.addElements(
 			new Arkanoid.Graphics.Element(background, 'img/background.png')
 			new Arkanoid.Graphics.Element(@pad, 'img/pad.png'),
@@ -47,6 +45,4 @@ class Arkanoid.Game
 		@pad.moveRight(delta) if @control.isRightActive()
 
 
-Arkanoid.init = ->
-	game = new Arkanoid.Game()
-	game.init()
+exportForModule 'Arkanoid', Game

@@ -1,5 +1,3 @@
-module 'Arkanoid.Control'
-
 class KeyboardMapping
 	@left: 37
 	@right: 39
@@ -22,7 +20,7 @@ class KeyboardController
 	ifRightButtonPressed: ->
 		@keysDown[KeyboardMapping.right]?
 
-class Arkanoid.Control.Facade
+class Facade
 	constructor: ->
 		@keyboardController = new KeyboardController()
 
@@ -31,3 +29,6 @@ class Arkanoid.Control.Facade
 
 	isRightActive: ->
 		@keyboardController.ifRightButtonPressed()
+
+
+exportForModule 'Arkanoid.Control', Facade

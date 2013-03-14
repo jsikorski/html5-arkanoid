@@ -24,7 +24,7 @@ module.exports = (grunt) ->
 			
 		concat:
 			game:
-				src: ['<%= config.build_dir %>/game/**/modules.js', '<%= config.build_dir %>/game/**/*.js']
+				src: ['<%= config.build_dir %>/game/**/exports.js', '<%= config.build_dir %>/game/**/*.js']
 				dest: '<%= config.release_dir %>/game/game.js'
 			server:
 				src: ['<%= config.build_dir %>/server/**/*.js']
