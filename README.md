@@ -1,6 +1,8 @@
 html5-arkanoid
 ==============
 
+[![Build Status](https://travis-ci.org/jsikorski/html5-arkanoid.png)](https://travis-ci.org/jsikorski/html5-arkanoid)
+
 Installation steps:
 
 1. Install node.js (with npm).
