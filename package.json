@@ -30,6 +30,5 @@
   },
   "dependencies": {
     "grunt-cli": "~0.1.6",
-    "websocket": "~1.0.8"
   }
 }
