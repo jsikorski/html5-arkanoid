@@ -4,7 +4,7 @@
   "description": "Smartphone controlled Arkanoid in HTML5.",
   "main": "index.js",
   "scripts": {
-    "test": "grunt"
+    "build": "grunt"
   },
   "repository": {
     "type": "git",
