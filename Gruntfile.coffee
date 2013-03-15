@@ -15,11 +15,16 @@ module.exports = (grunt) ->
 		copy:
 			build:
 				files: [
-					expand: true, cwd: '<%= config.src_dir %>', src: ['**/*.png', '**/*.html'], dest: '<%= config.build_dir %>/'
+					expand: true, 
+					cwd: '<%= config.src_dir %>', 
+					src: ['**/*.png', '**/*.html', '**/*.js'], 
+					dest: '<%= config.build_dir %>/'
 				]
 			release: 
 				files: [
-					expand: true, cwd: '<%= config.build_dir %>', src: ['**/*.png', '**/*.html'], dest: '<%= config.release_dir %>/'
+					expand: true, cwd: '<%= config.build_dir %>', 
+					src: ['**/*.png', '**/*.html'], 
+					dest: '<%= config.release_dir %>/'
 				]
 			
 		concat:
