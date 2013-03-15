@@ -1,5 +1,6 @@
 {
 	"src_dir": "src",
 	"build_dir": "build",
-	"release_dir": "release"
+	"release_dir": "release",
+	"modules_dir": "node_modules"
 }
