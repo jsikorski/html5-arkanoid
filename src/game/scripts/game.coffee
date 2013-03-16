@@ -2,29 +2,38 @@ class Game
 	constructor: ->
 		@pad = new Arkanoid.Models.Pad()
 		@ball = new Arkanoid.Models.Ball()
-		@control = new Arkanoid.Control.Facade()
-		@renderer = new Arkanoid.Graphics.Renderer()
 
 	init: ->
-		@createCanvasContext()
 		@initGraphics()
+		@initConnection()
+		@initControl()
 		@startMainLoop()
 
-	createCanvasContext: ->
-		canvas = document.createElement('canvas')
-		@canvasContext = canvas.getContext('2d')
-
-		canvas.width = 498
-		canvas.height = 750
-		document.body.appendChild(canvas)
-
 	initGraphics: ->
+		canvasContext = @createCanvasContext()
 		background = new Arkanoid.Models.Model()
+
+		@renderer = new Arkanoid.Graphics.Renderer(canvasContext)
 		@renderer.addElements(
 			new Arkanoid.Graphics.Element(background, 'img/background.png')
 			new Arkanoid.Graphics.Element(@pad, 'img/pad.png'),
 			new Arkanoid.Graphics.Element(@ball, 'img/ball.png')
 		)
+
+	createCanvasContext: ->
+		canvas = document.createElement('canvas')
+		canvas.width = 498
+		canvas.height = 750
+		document.body.appendChild(canvas)
+		
+		canvas.getContext('2d')
+
+	initConnection: ->
+		@client = new Arkanoid.Connection.WebSocketClient()
+		@client.connect(Arkanoid.Config.serverAddress)
+
+	initControl: ->
+		@control = new Arkanoid.Control.Facade(@client)
 
 	startMainLoop: ->
 		@then = Date.now()
@@ -35,7 +44,7 @@ class Game
 		delta = now - @then
 
 		@updatePadPosition(delta / 1000)
-		@renderer.render(@canvasContext)
+		@renderer.render()
 
 		@then = now
 

@@ -1,34 +1,66 @@
-class KeyboardMapping
-	@left: 37
-	@right: 39
+class ControlHandler
+	activeMoves: {}
 
-class KeyboardController
-	keysDown: {}
+	isLeftActive: ->
+		@activeMoves['left']?
+
+	isRightActive: ->
+		@activeMoves['right']?
+
+
+class KeyboardHandler extends ControlHandler
+	keyboardMapping:
+		37: 'left'
+		39: 'right'
 
 	constructor: ->
-		addEventListener('keydown', (e) =>
-			@keysDown[e.keyCode] = true
+		addEventListener('keydown', (e) => 
+			@pressKey(e.keyCode)
 		, false)
 
 		addEventListener('keyup', (e) =>
-			delete @keysDown[e.keyCode]
+			@unpressKey(e.keyCode)
 		, false)
 
-	isLeftButtonPressed: ->
-		@keysDown[KeyboardMapping.left]?
+	pressKey: (keyCode) ->
+		keyMap = @keyboardMapping[keyCode]
+		@activeMoves[keyMap] = true if keyMap?
 
-	ifRightButtonPressed: ->
-		@keysDown[KeyboardMapping.right]?
+	unpressKey: (keyCode) ->
+		keyMap = @keyboardMapping[keyCode]
+		delete @activeMoves[keyMap] if keyMap?
+
+
+class ServerHandler extends ControlHandler
+	constructor: (webSocketClient) ->
+		webSocketClient.on("move:left", => 
+			@activeMoves['left'] = true
+		)
+		
+		webSocketClient.on("move:right", => 
+			@activeMoves['right'] = true
+		)
+		
+		webSocketClient.on("move:reset", =>  
+			delete @activeMoves['left']
+			delete @activeMoves['right']
+		)
+
 
 class Facade
-	constructor: ->
-		@keyboardController = new KeyboardController()
+	controlHandlers: []
+
+	constructor: (webSocketClient) ->
+		@controlHandlers.push(
+			new KeyboardHandler(),
+			new ServerHandler(webSocketClient)
+		)
 
 	isLeftActive: ->
-		@keyboardController.isLeftButtonPressed()
+		_.some(@controlHandlers, (handler) -> handler.isLeftActive())
 
 	isRightActive: ->
-		@keyboardController.ifRightButtonPressed()
+		_.some(@controlHandlers, (handler) -> handler.isRightActive())
 
 
 exportForModule 'Arkanoid.Control', Facade

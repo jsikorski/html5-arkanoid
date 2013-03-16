@@ -10,14 +10,15 @@ class Element
 		canvasContext.drawImage(@img, @model.x, @model.y) if @ready
 
 class Renderer
+	elements: []
+
 	constructor: (@canvasContext) ->
-		@elements = []
 
 	addElements: (elements...) ->
 		@elements.push(element) for element in elements
 
-	render: (canvasContext) ->
-		element.render(canvasContext) for element in @elements
+	render: ->
+		element.render(@canvasContext) for element in @elements
 
 
 exportForModule 'Arkanoid.Graphics', Element, Renderer

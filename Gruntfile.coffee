@@ -15,28 +15,34 @@ module.exports = (grunt) ->
 		copy:
 			build:
 				files: [
-					expand: true, 
-					cwd: '<%= config.src_dir %>', 
-					src: ['**/*.png', '**/*.html', '**/*.js'], 
+					expand: true
+					cwd: '<%= config.src_dir %>'
+					src: ['**/*.png', '**/*.html', '**/*.js'] 
 					dest: '<%= config.build_dir %>/'
 				]
 			release: 
 				files: [
-					expand: true, cwd: '<%= config.build_dir %>', 
-					src: ['**/*.png', '**/*.html'], 
+					expand: true 
+					cwd: '<%= config.build_dir %>' 
+					src: ['**/*.png', '**/*.html'] 
 					dest: '<%= config.release_dir %>/'
 				]
 			
 		concat:
 			game:
 				src: [
+					'<%= config.modules_dir %>/underscore/underscore.js'
 					'<%= config.modules_dir %>/socket.io/node_modules/socket.io-client/dist/socket.io.js'
-					'<%= config.build_dir %>/game/**/exports.js', 
+					'<%= config.build_dir %>/common/**/*.js'
+					'<%= config.build_dir %>/game/**/exports.js'
 					'<%= config.build_dir %>/game/**/*.js'
 				]
 				dest: '<%= config.release_dir %>/game/game.js'
 			server:
-				src: ['<%= config.build_dir %>/server/**/*.js']
+				src: [
+					'<%= config.build_dir %>/common/**/*.js'
+					'<%= config.build_dir %>/server/**/*.js'
+				]
 				dest: '<%= config.release_dir %>/server/server.js'
 
 	grunt.loadNpmTasks('grunt-contrib-clean')
