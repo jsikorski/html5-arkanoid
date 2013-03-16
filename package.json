@@ -2,6 +2,7 @@
   "name": "html5-arkanoid",
   "version": "0.0.0",
   "description": "Smartphone controlled Arkanoid in HTML5.",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "build": "grunt"
