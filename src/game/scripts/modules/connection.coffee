@@ -5,7 +5,7 @@ class WebSocketClient
 		@connection = io.connect(serverAddress)
 		@connection.on('message', @handleMessage)
 
-	handleMessage: (message, callback) ->
+	handleMessage: (message, callback) =>
 		messageType = message.type
 		handler.callback(message) for handler in @handlers when handler.messageType is messageType
 
