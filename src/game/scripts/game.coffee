@@ -7,6 +7,7 @@ class Game
 		@initGraphics()
 		@initConnection()
 		@initControl()
+		@initPhysics()
 		@startMainLoop()
 
 	initGraphics: ->
@@ -35,6 +36,10 @@ class Game
 	initControl: ->
 		@control = new Arkanoid.Control.Facade(@client)
 
+	initPhysics: ->
+		@physicsUpdater = new Arkanoid.Physics.Updater()
+		@physicsUpdater.addModels(@ball,@pad)
+
 	startMainLoop: ->
 		@then = Date.now()
 		setInterval(@mainLoop, 1)
@@ -43,15 +48,11 @@ class Game
 		now = Date.now()
 		delta = now - @then
 
-		@updatePadPosition(delta / 1000)
-		@renderer.render()
+		@physicsUpdater.update(delta/1000, @control)
 
+		@renderer.render()
 		@then = now
 
-	updatePadPosition: (modifier) ->
-		delta = 255 * modifier
-		@pad.moveLeft(delta) if @control.isLeftActive()
-		@pad.moveRight(delta) if @control.isRightActive()
-
+	looseLife: ->
 
 exportForModule 'Arkanoid', Game

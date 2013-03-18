@@ -7,11 +7,18 @@ class ControlHandler
 	isRightActive: ->
 		@activeMoves['right']?
 
+	isStartActive: ->
+		@activeMoves['start']?
+
+	reset: (stateName)->
+		delete @activeMoves['stateName']
+
 
 class KeyboardHandler extends ControlHandler
 	keyboardMapping:
 		37: 'left'
 		39: 'right'
+		32: 'start'
 
 	constructor: ->
 		addEventListener('keydown', (e) => 
@@ -40,10 +47,14 @@ class ServerHandler extends ControlHandler
 		webSocketClient.on("move:right", => 
 			@activeMoves['right'] = true
 		)
+
+		webSocketClient.on("start", => 
+			@activeMoves['start'] = true
+		)
 		
 		webSocketClient.on("move:reset", =>  
-			delete @activeMoves['left']
-			delete @activeMoves['right']
+			@reset('left')
+			@reset('right')
 		)
 
 
@@ -62,5 +73,10 @@ class Facade
 	isRightActive: ->
 		_.some(@controlHandlers, (handler) -> handler.isRightActive())
 
+	isStartActive: ->
+		_.some(@controlHandlers, (handler) -> handler.isStartActive())
+
+	resetForAll: (stateName)->
+		handler.reset(stateName) for handler in @controlHandlers
 
 exportForModule 'Arkanoid.Control', Facade
