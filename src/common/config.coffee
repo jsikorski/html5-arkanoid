@@ -1,4 +1,10 @@
-window.Arkanoid ?= {}
-Arkanoid.Config ?= {}
+root = exports ? this
 
-Arkanoid.Config.serverAddress = 'http://localhost:8080'
+root.Arkanoid ?= {}
+root.Arkanoid.Config ?= {}
+
+root.Arkanoid.Config.serverAddress = 'http://localhost'
+root.Arkanoid.Config.httpPort = 8080
+root.Arkanoid.Config.androidPort = 8081
+
+

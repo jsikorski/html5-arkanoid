@@ -1,13 +1,15 @@
 class WebSocketClient
 	handlers: []
 
-	connect: (serverAddress) ->
-		@connection = io.connect(serverAddress)
+	connect: (serverAddress, serverPort) ->
+		@connection = io.connect(serverAddress + ":" + serverPort)
 		@connection.on('message', @handleMessage)
 
 	handleMessage: (message, callback) =>
 		messageType = message.type
 		handler.callback(message) for handler in @handlers when handler.messageType is messageType
+		console.log message
+		console.log message.type
 
 	on: (messageType, callback) ->
 		handler = 

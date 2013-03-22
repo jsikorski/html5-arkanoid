@@ -31,7 +31,7 @@ class Game
 
 	initConnection: ->
 		@client = new Arkanoid.Connection.WebSocketClient()
-		@client.connect(Arkanoid.Config.serverAddress)
+		@client.connect(Arkanoid.Config.serverAddress, Arkanoid.Config.httpPort)
 
 	initControl: ->
 		@control = new Arkanoid.Control.Facade(@client)

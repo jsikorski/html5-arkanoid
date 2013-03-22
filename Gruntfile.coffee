@@ -22,10 +22,16 @@ module.exports = (grunt) ->
 				]
 			release: 
 				files: [
-					expand: true 
-					cwd: '<%= config.build_dir %>' 
-					src: ['**/*.png', '**/*.html'] 
-					dest: '<%= config.release_dir %>/'
+					{
+						expand: true 
+						cwd: '<%= config.build_dir %>'
+						src: ['**/*.png', '**/*.html']
+						dest: '<%= config.release_dir %>/'
+					},						
+					{
+						src: '<%= config.build_dir %>/common/config.js'
+						dest: '<%= config.release_dir %>/common/config.js'
+					}
 				]
 			
 		concat:
@@ -40,7 +46,6 @@ module.exports = (grunt) ->
 				dest: '<%= config.release_dir %>/game/game.js'
 			server:
 				src: [
-					'<%= config.build_dir %>/common/**/*.js'
 					'<%= config.build_dir %>/server/**/*.js'
 				]
 				dest: '<%= config.release_dir %>/server/server.js'
