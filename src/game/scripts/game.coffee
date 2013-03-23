@@ -41,7 +41,7 @@ class Game
 
 	startMainLoop: ->
 		@then = Date.now()
-		setInterval(@mainLoop, 1)
+		@mainLoop()
 
 	mainLoop: =>
 		now = Date.now()
@@ -51,6 +51,8 @@ class Game
 
 		@renderer.render()
 		@then = now
+		
+		requestAnimationFrame(@mainLoop)
 
 	looseLife: ->
 
