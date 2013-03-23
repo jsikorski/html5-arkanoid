@@ -76,7 +76,7 @@ class Facade
 	isStartActive: ->
 		_.some(@controlHandlers, (handler) -> handler.isStartActive())
 
-	resetForAll: (stateName)->
+	reset: (stateName)->
 		handler.reset(stateName) for handler in @controlHandlers
 
 exportForModule 'Arkanoid.Control', Facade

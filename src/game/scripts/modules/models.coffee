@@ -1,45 +1,66 @@
+##### Basic models ######
+
 class Model
 	x: 0
 	y: 0
-	height:0
-	width:0
+	height: 0
+	width: 0
+	
+	constructor: ->
+		@collidingModels = []
+
+	update: ->
+		@handleCollisions()
+
+	addCollidingModel: (model) ->
+		@collidingModels.push(model)
+
+	handleCollisions: ->
+		@handleCollision(model) for model in @collidingModels
+		@collidingModels.length = 0
+
+	handleCollision: (collidingModel) ->
+		modelTypeName = collidingModel.constructor.name
+		methodName = "handle#{modelTypeName}Collision"
+		method = @[methodName]
+		method.call(@) if method?
 
 	collides: (c) ->
 		(
 			(
 				(
-					(@x > @c.x) and
-					(@x < @c.x + @c.width)
+					(@x >= c.x) and
+					(@x <= c.x + c.width)
 				) or
 				(
-					(@x + @width > @c.x) and
-					(@x + @width < @c.x + @c.width)
+					(@x + @width >= c.x) and
+					(@x + @width <= c.x + c.width)
 				) or
 				(
-					(@x < @c.x) and 
-					(@x + @width > @c.x + @c.width)
+					(@x <= c.x) and 
+					(@x + @width >= c.x + c.width)
 				) or
 				(
-					(@x > @c.x) and 
-					(@x + @width < @c.x + @c.width)
+					(@x >= c.x) and 
+					(@x + @width <= c.x + c.width)
 				)
 			)and
 			(
 				(
-					(@y > @c.y) and
-					(@y < @c.y + @c.height)
+					(@y >= c.y) and
+					(@y <= c.y + c.height)
 				)or
 				(
-					(@y + @height > @c.y) and
-					(@y + @height < @c.y + @c.height)
+					(@y + @height >= c.y) and
+					(@y + @height <= c.y + c.height)
 				)or
 				(
-					(@y < @c.y) and 
-					(@y + @height > @c.y + @c.height)
+					(@y <= c.y) and 
+					(@y + @height >= c.y + c.height)
 				)or
 				(
-					(@y > @c.y) and 
-					(@y + @height < @c.y + @c.height)
+					(@y >= c.y) and 
+					(@y + @height <= c.y + c.height)
 				)
 			)
 		)
@@ -47,10 +68,11 @@ class Model
 class Pad extends Model
 	x: 250
 	y: 700
-	height:27
-	width:129
+	height: 27
+	width: 129
 
-	update: (modifier,control)->
+	update: (modifier, control)->
+		super()
 		# TODO magic numbers!
 		delta = 255 * modifier
 		@moveLeft(delta) if control.isLeftActive()
@@ -65,39 +87,74 @@ class Pad extends Model
 class Ball extends Model
 	x: 275
 	y: 680
-	height:36
-	width:38
+	height: 36
+	width: 38
 
-	velX:0
-	velY:0
+	velX: 0
+	velY: 0
 
-	update: (modifier,control)->
+	update: (modifier, control)->
+		super()
 
 		if (control.isStartActive())
-			control.resetForAll('start')
+			control.reset('start')
 			@velX = 255
 			@velY = -255
 
 		@x += @velX * modifier
 		@y += @velY * modifier
 
-		# wall collisions
-		if (@x > 498)
-			@x = 2*498 - @x
-			@velX = -@velX
+	handleTopEdgeCollision: ->
+		@velY = -@velY
 
-		if (@x < 0)
-			@x = - @x
-			@velX = -@velX	
+	handleBottomEdgeCollision: ->
+		@isAlive = false
 
-		if (@y < 0)
-			@y = - @y
-			@velY = -@velY
+	handleVerticalEdgeCollision: ->
+		@velX = -@velX
 
-		# pad collisions
+	handlePadCollision: ->
+		@velY = -@velY		
 
-		if (@y > 750)
-			@isAlive = false
+##### Edges #####
+
+class TopEdge extends Model
+	constructor: (@width) ->
+		super()
+
+class BottomEdge extends Model
+	constructor: (@y, @width) ->
+		super()
+
+class VerticalEdge extends Model
+	constructor: (@x, @height) ->
+		super()
+
+class EdgesBuilder
+	@buildFor: (boardWidth, boardHeight) ->
+		return [
+			new TopEdge(boardWidth)
+			new VerticalEdge(0, boardHeight)
+			new VerticalEdge(boardWidth, boardHeight)
+			new BottomEdge(boardHeight)
+		]
+
+##### Services #####
+
+class CollisionsDetector
+	collisionsPairs: []
+
+	addPair: (model1, model2) ->
+		@collisionsPairs.push([model1, model2])
+
+	addMany: (model, models) ->
+		@addPair(model, model2) for model2 in models
+
+	check: ->
+		for pair in @collisionsPairs
+			do ->
+				pair[0].addCollidingModel(pair[1]) if pair[0].collides(pair[1])
+				pair[1].addCollidingModel(pair[0]) if pair[1].collides(pair[0])
 
 class Updater
 	models: []
@@ -112,4 +169,4 @@ class Updater
 		model.update(modifier, control) for model in @models	
 
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, Updater
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, CollisionsDetector, Updater
