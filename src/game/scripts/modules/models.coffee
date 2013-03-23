@@ -50,17 +50,17 @@ class Pad extends Model
 	height:27
 	width:129
 
-	moveLeft: (delta) ->
-		@x -= delta
-
-	moveRight: (delta) ->
-		@x += delta
-
 	update: (modifier,control)->
 		# TODO magic numbers!
 		delta = 255 * modifier
 		@moveLeft(delta) if control.isLeftActive()
 		@moveRight(delta) if control.isRightActive()
+
+	moveLeft: (delta) ->
+		@x -= delta
+
+	moveRight: (delta) ->
+		@x += delta
 
 class Ball extends Model
 	x: 275
@@ -97,7 +97,19 @@ class Ball extends Model
 		# pad collisions
 
 		if (@y > 750)
-			Arkanoid.Game.looseLife()
-			
+			@isAlive = false
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball
+class Updater
+	models: []
+
+	constructor: (models) ->
+		@addModels(models)
+
+	addModels: (models)  ->
+		@models = @models.concat(models)
+
+	update: (modifier, control) ->
+		model.update(modifier, control) for model in @models	
+
+
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, Updater

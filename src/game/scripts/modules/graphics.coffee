@@ -12,10 +12,11 @@ class Element
 class Renderer
 	elements: []
 
-	constructor: (@canvasContext) ->
+	constructor: (@canvasContext, elements) ->
+		@addElements(elements)
 
-	addElements: (elements...) ->
-		@elements.push(element) for element in elements
+	addElements: (elements) ->
+		@elements = @elements.concat(elements)
 
 	render: ->
 		element.render(@canvasContext) for element in @elements

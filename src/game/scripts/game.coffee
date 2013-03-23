@@ -1,25 +1,26 @@
 class Game
-	constructor: ->
-		@pad = new Arkanoid.Models.Pad()
-		@ball = new Arkanoid.Models.Ball()
-
 	init: ->
-		@initGraphics()
-		@initConnection()
-		@initControl()
-		@initPhysics()
+		pad = new Arkanoid.Models.Pad()
+		ball = new Arkanoid.Models.Ball()
+		client = new Arkanoid.Connection.WebSocketClient()
+
+		@initGraphics(pad, ball)
+		@initModels(pad, ball)
+		@initConnection(client)
+		@initControl(client)
 		@startMainLoop()
 
-	initGraphics: ->
+	initGraphics: (pad, ball) ->
 		canvasContext = @createCanvasContext()
 		background = new Arkanoid.Models.Model()
 
-		@renderer = new Arkanoid.Graphics.Renderer(canvasContext)
-		@renderer.addElements(
+		elements = [
 			new Arkanoid.Graphics.Element(background, 'img/background.png')
-			new Arkanoid.Graphics.Element(@pad, 'img/pad.png'),
-			new Arkanoid.Graphics.Element(@ball, 'img/ball.png')
-		)
+			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
+			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
+		]
+
+		@renderer = new Arkanoid.Graphics.Renderer(canvasContext, elements)
 
 	createCanvasContext: ->
 		canvas = document.createElement('canvas')
@@ -29,16 +30,14 @@ class Game
 		
 		canvas.getContext('2d')
 
-	initConnection: ->
-		@client = new Arkanoid.Connection.WebSocketClient()
-		@client.connect(Arkanoid.Config.serverAddress, Arkanoid.Config.httpPort)
+	initModels: (pad, ball) ->
+		@modelsUpdater = new Arkanoid.Models.Updater([pad, ball])
 
-	initControl: ->
-		@control = new Arkanoid.Control.Facade(@client)
+	initConnection: (client) ->
+		client.connect(Arkanoid.Config.serverAddress, Arkanoid.Config.httpPort)
 
-	initPhysics: ->
-		@physicsUpdater = new Arkanoid.Physics.Updater()
-		@physicsUpdater.addModels(@ball,@pad)
+	initControl: (client) ->
+		@control = new Arkanoid.Control.Facade(client)
 
 	startMainLoop: ->
 		@then = Date.now()
@@ -48,7 +47,7 @@ class Game
 		now = Date.now()
 		delta = now - @then
 
-		@physicsUpdater.update(delta/1000, @control)
+		@modelsUpdater.update(delta/1000, @control)
 
 		@renderer.render()
 		@then = now
