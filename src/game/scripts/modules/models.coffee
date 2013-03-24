@@ -12,6 +12,10 @@ class Model
 	update: ->
 		@handleCollisions()
 
+	move: (xDelta,yDelta) ->
+		@x += xDelta
+		@y += yDelta
+
 	addCollidingModel: (model) ->
 		@collidingModels.push(model)
 
@@ -66,43 +70,49 @@ class Model
 		)
 
 class Pad extends Model
-	x: 250
+	x: 200
 	y: 700
 	height: 27
 	width: 129
+	speed: 255
 
 	update: (modifier, control)->
 		super()
-		# TODO magic numbers!
-		delta = 255 * modifier
-		@moveLeft(delta) if control.isLeftActive()
-		@moveRight(delta) if control.isRightActive()
-
-	moveLeft: (delta) ->
-		@x -= delta
-
-	moveRight: (delta) ->
-		@x += delta
+		if control.isLeftActive() and  @x > 0
+			@move(-@speed * modifier,0)
+		if control.isRightActive() and  @x + @width < 500	 
+			@move(@speed * modifier,0) 
 
 class Ball extends Model
-	x: 275
-	y: 680
+	x: 250
+	y: 660
 	height: 36
 	width: 38
 
+	# speed of the ball moving along with pad
+	# in the beginning of game
+	speedOnPad: 255 
+
+	started: false
 	velX: 0
 	velY: 0
 
 	update: (modifier, control)->
 		super()
 
-		if (control.isStartActive())
+		if ((!@started) and control.isStartActive())
+			@started = true
 			control.reset('start')
-			@velX = 255
-			@velY = -255
+			@velX = 150
+			@velY = -150
 
-		@x += @velX * modifier
-		@y += @velY * modifier
+		if (@started)
+			@move(@velX * modifier,@velY * modifier)
+		else
+			if control.isLeftActive() and  @x > 60
+				@move(-@speedOnPad * modifier,0)
+			if control.isRightActive() and  @x + @width< 440	 
+				@move(@speedOnPad * modifier,0) 
 
 	handleTopEdgeCollision: ->
 		@velY = -@velY
@@ -114,7 +124,7 @@ class Ball extends Model
 		@velX = -@velX
 
 	handlePadCollision: ->
-		@velY = -@velY		
+		 @velY = -@velY		
 
 ##### Edges #####
 
