@@ -1,6 +1,6 @@
 class Board
-	@width: 498
-	@height: 750
+	@width: 498 #window.innerWidth
+	@height: 750 #window.innerHeight
 
 class Game
 	init: ->

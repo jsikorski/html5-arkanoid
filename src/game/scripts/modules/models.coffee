@@ -72,7 +72,7 @@ class Model
 class Pad extends Model
 	x: 200
 	y: 700
-	height: 27
+	height: 60
 	width: 129
 	speed: 255
 
@@ -124,7 +124,8 @@ class Ball extends Model
 		@velX = -@velX
 
 	handlePadCollision: ->
-		 @velY = -@velY		
+		if @velY > 0 
+		 	@velY = -@velY		
 
 ##### Edges #####
 
