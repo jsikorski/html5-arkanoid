@@ -41,8 +41,13 @@ class Game
 		
 		@collisionsDetector = new Arkanoid.Models.CollisionsDetector()
 		@collisionsDetector.addPair(ball, pad)
+		@collisionsDetector.addMany(pad, edges)
 		@collisionsDetector.addMany(ball, edges)
 
+		offsetX = pad.width / 2 - ball.width / 2
+		offsetY = -ball.height
+		ball.bindPositionTo(pad, offsetX,  offsetY)
+		
 		@modelsUpdater = new Arkanoid.Models.Updater([pad, ball])
 
 	initConnection: (client) ->

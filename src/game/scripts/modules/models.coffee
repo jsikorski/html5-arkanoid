@@ -1,18 +1,25 @@
 ##### Basic models ######
 
 class Model
-	x: 0
-	y: 0
-	height: 0
-	width: 0
+	x 		: 0
+	y 		: 0
+	height 	: 0
+	width 	: 0
 	
 	constructor: ->
 		@collidingModels = []
 
 	update: ->
+		@handlePositionBinding()
 		@handleCollisions()
 
-	move: (xDelta,yDelta) ->
+	handlePositionBinding: ->
+		return if not @positionBinding
+		@x = @positionBinding.model.x + @positionBinding.offsetX
+		@y = @positionBinding.model.y + @positionBinding.offsetY
+
+	move: (xDelta, yDelta) ->
+		return if @positionBinding
 		@x += xDelta
 		@y += yDelta
 
@@ -69,63 +76,77 @@ class Model
 			)
 		)
 
+	bindPositionTo: (model, offsetX, offsetY) ->
+		@positionBinding =
+			model: model
+			offsetX: offsetX,
+			offsetY: offsetY
+
+	unbindPosition: ->
+		delete @positionBinding
+
 class Pad extends Model
-	x: 200
-	y: 700
-	height: 60
-	width: 129
-	speed: 255
+	x 	 	: 200
+	y 		: 700
+	height 	: 60
+	width 	: 129
+	speed 	: 255
 
 	update: (modifier, control)->
 		super()
-		if control.isLeftActive() and  @x > 0
-			@move(-@speed * modifier,0)
-		if control.isRightActive() and  @x + @width < 500	 
-			@move(@speed * modifier,0) 
+		
+		if control.isRightActive() and not @rightCollisionDetected
+			@move(@speed * modifier, 0)
+		
+		if control.isLeftActive() and not @leftCollisionDetected
+			@move(-@speed * modifier, 0)
+
+		delete @rightCollisionDetected
+		delete @leftCollisionDetected
+
+	handleRightEdgeCollision: ->
+		@rightCollisionDetected = true
+
+	handleLeftEdgeCollision: ->
+		@leftCollisionDetected = true
 
 class Ball extends Model
-	x: 250
-	y: 660
-	height: 36
-	width: 38
-
-	# speed of the ball moving along with pad
-	# in the beginning of game
-	speedOnPad: 255 
-
-	started: false
-	velX: 0
-	velY: 0
+	x 		: 250
+	y 		: 660
+	height 	: 36
+	width 	: 38
+	velX	: 0
+	velY	: 0
 
 	update: (modifier, control)->
 		super()
 
-		if ((!@started) and control.isStartActive())
+		if control.isStartActive() and not @started
 			@started = true
 			control.reset('start')
 			@velX = 150
 			@velY = -150
+			@unbindPosition()
 
-		if (@started)
-			@move(@velX * modifier,@velY * modifier)
-		else
-			if control.isLeftActive() and  @x > 60
-				@move(-@speedOnPad * modifier,0)
-			if control.isRightActive() and  @x + @width< 440	 
-				@move(@speedOnPad * modifier,0) 
+		@move(@velX * modifier, @velY * modifier) if @started
 
 	handleTopEdgeCollision: ->
 		@velY = -@velY
 
-	handleBottomEdgeCollision: ->
-		@isAlive = false
+	handleRightEdgeCollision: ->
+		@handleVerticalEdgeCollision()
 
 	handleVerticalEdgeCollision: ->
 		@velX = -@velX
 
+	handleBottomEdgeCollision: ->
+		@isAlive = false
+
+	handleLeftEdgeCollision: ->
+		@handleVerticalEdgeCollision()
+
 	handlePadCollision: ->
-		if @velY > 0 
-		 	@velY = -@velY		
+	 	@velY = -@velY if @velY > 0
 
 ##### Edges #####
 
@@ -133,21 +154,25 @@ class TopEdge extends Model
 	constructor: (@width) ->
 		super()
 
+class RightEdge extends Model
+	constructor: (@x, @height) ->
+		super()
+
 class BottomEdge extends Model
 	constructor: (@y, @width) ->
 		super()
 
-class VerticalEdge extends Model
-	constructor: (@x, @height) ->
+class LeftEdge extends Model
+	constructor: (@height) ->
 		super()
 
 class EdgesBuilder
 	@buildFor: (boardWidth, boardHeight) ->
 		return [
 			new TopEdge(boardWidth)
-			new VerticalEdge(0, boardHeight)
-			new VerticalEdge(boardWidth, boardHeight)
+			new RightEdge(boardWidth, boardHeight)
 			new BottomEdge(boardHeight)
+			new LeftEdge(boardHeight)
 		]
 
 ##### Services #####
