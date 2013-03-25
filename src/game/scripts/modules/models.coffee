@@ -179,7 +179,7 @@ class EdgesBuilder
 		return [
 			new TopEdge(boardWidth)
 			new RightEdge(boardWidth, boardHeight)
-			new BottomEdge(boardHeight)
+			new BottomEdge(boardHeight, boardWidth)
 			new LeftEdge(boardHeight)
 		]
 
