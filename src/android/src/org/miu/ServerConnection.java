@@ -119,7 +119,7 @@ public class ServerConnection {
 		if(isConnected) {
 			try {
 				JSONArray arguments = new JSONArray();		
-				arguments.put("type");
+				//arguments.put("type");
 				arguments.put("move:"+msg);	
 				
 				client.emit("message",arguments);
@@ -143,7 +143,7 @@ public class ServerConnection {
 	public boolean pushStart() {
 		try {
 			JSONArray arguments = new JSONArray();
-			arguments.put("type");
+			//arguments.put("type");
 			arguments.put("start");	
 			
 			client.emit("message",arguments);

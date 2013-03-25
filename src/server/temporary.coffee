@@ -8,29 +8,34 @@ class Mediator
 		@htmlConnector = new HtmlConnector(@)
 	
 	notifyAndroidConnector: ->
-		@androidConnector.notify
+		console.log 'Notification sent'
+		androidConnector.notify
 	
 	forewardMessage: (message, sender) ->
 		console.log 'forewarding'
-		if sender instanceof AndroidConnector
-			console.log 'SEND TO HTML'
-			@htmlConnector.forewardMessage(message)
+		#if sender instanceof AndroidConnector
+		console.log 'SEND TO HTML'
+		@htmlConnector.forewardMessage(message)
 			
 		
 			
 	
 class AndroidConnector
 	
-	constructor: (mediator) ->
-		@mediator = mediator
-		@io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
-		console.log 'Connected with Android application'
+	constructor: (med) ->
+		mediator = med
+		io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
+		console.log '[Android] Waiting for connection'
 		
-	notify: ->
-		@io.sockets.on('connection', (socket) ->
+		io.sockets.on('connection', (socket) ->
+			console.log '[Android] Connected'
 			
-			socket.on('message', (message) 		
-				@mediator.forewardMessage(message, @)
+			#io.sockets.emit('message', {type : 'move:left'})
+			#console.log '[Android] Message sent'
+			
+			socket.on('message', (message) ->
+				console.log message		
+				mediator.forewardMessage(message, @)
 			)
 		)
 		
@@ -40,24 +45,25 @@ class HtmlConnector
 
 	constructor: (med) ->
 		mediator = med
-		io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
-		console.log 'Connected with HTTP application'
+		@io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
+		console.log '[HTML] Waiting for connection'
 
-		io.sockets.on('connection', (socket) ->
-			console.log 'on connection'
+		@io.sockets.on('connection', (socket) ->
+			console.log '[HTML] Connected'
 			mediator.notifyAndroidConnector
 			
 			
 			#io.sockets.emit('message', {type : 'move:left'})
-			console.log 'message sent'
-			
-		)
+			#console.log 'message sent'
+		)	
+		
 		
 	forewardMessage: (message) ->
-		io.sockets.emit('message', message)
+		console.log 'Sent'
+		@io.sockets.emit('message', message)
 
 
-	#	socket.emit('message', {type : 'move:left'})
+		#io.sockets.emit('message', {type : 'move:left'})
 	
 
 mediator = new Mediator()
