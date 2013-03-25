@@ -1,5 +1,5 @@
 class Board
-	@width: 498 #window.innerWidth
+	@width: 500 #window.innerWidth
 	@height: 750 #window.innerHeight
 
 class Game
@@ -39,15 +39,14 @@ class Game
 	initModels: (pad, ball) ->
 		edges = Arkanoid.Models.EdgesBuilder.buildFor(Board.width, Board.height)
 		
-		@collisionsDetector = new Arkanoid.Models.CollisionsDetector()
-		@collisionsDetector.addPair(ball, pad)
-		@collisionsDetector.addMany(pad, edges)
-		@collisionsDetector.addMany(ball, edges)
+		pad.addCollidingModels(edges)
+		ball.addCollidingModels(pad)
+		ball.addCollidingModels(edges)
 
 		offsetX = pad.width / 2 - ball.width / 2
 		offsetY = -ball.height
-		ball.bindPositionTo(pad, offsetX,  offsetY)
-		
+		ball.bindPositionWith(pad, offsetX,  offsetY)
+
 		@modelsUpdater = new Arkanoid.Models.Updater([pad, ball])
 
 	initConnection: (client) ->
@@ -64,7 +63,6 @@ class Game
 		now = Date.now()
 		delta = now - @then
 
-		@collisionsDetector.check()
 		@modelsUpdater.update(delta/1000, @control)
 
 		@renderer.render()

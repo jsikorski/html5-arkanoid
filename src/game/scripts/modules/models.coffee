@@ -7,10 +7,30 @@ class Model
 	width 	: 0
 	
 	constructor: ->
-		@collidingModels = []
+		@potentiallyCollidingModels = []
+		@actuallyCollidingModels = []
+
+	move: (xDelta, yDelta) ->
+		return if @positionBinding
+		@x += xDelta
+		@y += yDelta
+
+	bindPositionWith: (model, offsetX, offsetY) ->
+		@positionBinding =
+			model 	: model
+			offsetX : offsetX
+			offsetY : offsetY
+
+	unbindPosition: ->
+		delete @positionBinding
+
+	addCollidingModels: (models) ->
+		models = [models] if not _.isArray(models)
+		@potentiallyCollidingModels = @potentiallyCollidingModels.concat(models)
 
 	update: ->
 		@handlePositionBinding()
+		@checkCollisions()
 		@handleCollisions()
 
 	handlePositionBinding: ->
@@ -18,17 +38,14 @@ class Model
 		@x = @positionBinding.model.x + @positionBinding.offsetX
 		@y = @positionBinding.model.y + @positionBinding.offsetY
 
-	move: (xDelta, yDelta) ->
-		return if @positionBinding
-		@x += xDelta
-		@y += yDelta
-
-	addCollidingModel: (model) ->
-		@collidingModels.push(model)
+	checkCollisions: ->
+		for model in @potentiallyCollidingModels
+			do =>
+				@actuallyCollidingModels.push(model) if @collides(model)
 
 	handleCollisions: ->
-		@handleCollision(model) for model in @collidingModels
-		@collidingModels.length = 0
+		@handleCollision(model) for model in @actuallyCollidingModels
+		@actuallyCollidingModels.length = 0
 
 	handleCollision: (collidingModel) ->
 		modelTypeName = collidingModel.constructor.name
@@ -75,15 +92,6 @@ class Model
 				)
 			)
 		)
-
-	bindPositionTo: (model, offsetX, offsetY) ->
-		@positionBinding =
-			model: model
-			offsetX: offsetX,
-			offsetY: offsetY
-
-	unbindPosition: ->
-		delete @positionBinding
 
 class Pad extends Model
 	x 	 	: 200
@@ -177,21 +185,6 @@ class EdgesBuilder
 
 ##### Services #####
 
-class CollisionsDetector
-	collisionsPairs: []
-
-	addPair: (model1, model2) ->
-		@collisionsPairs.push([model1, model2])
-
-	addMany: (model, models) ->
-		@addPair(model, model2) for model2 in models
-
-	check: ->
-		for pair in @collisionsPairs
-			do ->
-				pair[0].addCollidingModel(pair[1]) if pair[0].collides(pair[1])
-				pair[1].addCollidingModel(pair[0]) if pair[1].collides(pair[0])
-
 class Updater
 	models: []
 
@@ -205,4 +198,4 @@ class Updater
 		model.update(modifier, control) for model in @models	
 
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, CollisionsDetector, Updater
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Updater
