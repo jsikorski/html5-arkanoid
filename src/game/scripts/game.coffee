@@ -17,9 +17,11 @@ class Game
 	initGraphics: (pad, ball) ->
 		canvasContext = @createCanvasContext()
 		background = new Arkanoid.Models.Model()
+		background.width = Board.width
+		background.height = Board.height
 
 		elements = [
-			new Arkanoid.Graphics.Element(background, 'img/background.png')
+			new Arkanoid.Graphics.Element(background, 'img/background.jpg')
 			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
 			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
 		]
