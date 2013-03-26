@@ -18,8 +18,6 @@ import org.miu.R;
 import org.miu.MySensor;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -28,6 +26,7 @@ import android.preference.PreferenceManager;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 /**
  * @author Miko³aj Jankowski
@@ -52,9 +51,6 @@ public class GameActivity extends Activity {
      * @return void
      * @throws none
      */
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onBackPressed()
-	 */
 	public void onBackPressed() {
 		if (g != null) {
 			stop = true;
@@ -64,7 +60,7 @@ public class GameActivity extends Activity {
 			server = null;
 			handler.removeCallbacks(runnable);
 		}
-		//server = null;
+		server = null;
 		finish();
 	}
 
@@ -75,9 +71,6 @@ public class GameActivity extends Activity {
      * @return void
      * @throws none
      */
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,37 +89,20 @@ public class GameActivity extends Activity {
 
 		left = (ImageView) findViewById(R.id.arrowLeft);
 		right = (ImageView) findViewById(R.id.arrowRight);
-
-	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);	   
-	    final String ip = prefs.getString("adres", "192.168.1.1");
-	    final String port = prefs.getString("port", "8080");
-	       
-	    server = new ServerConnection(); 
+		
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);	
+		
+		server = new ServerConnection();
+			   
+		final String ip = prefs.getString("adres", "192.168.1.1");
+		final String port = prefs.getString("port", "8080");
+		   
+		server.connect(ip, port);
 	    
-		final Runnable connectRunnable = new Runnable() {
-			public void run() {
-				server.connect(ip, port);		
-			}
-		};
-	    connectRunnable.run();
-	    
-	    int count = 0;
-	    while(count < 20){
-	    	try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-			}
-	    	if(server.isConnected())
-	    		count = 20;
-	    	else
-	    		count++;
-	    }
-	    
+		server.waitForConnection();
+		
 		if (server.isConnected()) {
 			g = new MySensor(this);
-
 			stop = false;
 
 			handler = new Handler();
@@ -135,33 +111,37 @@ public class GameActivity extends Activity {
 					if (stop == true) {
 						g.Stop();
 					} else {
-						if (g.getDirection() != now && g.getDirection() == Direction.LEFT) {
-							goLeft();
-							now = Direction.LEFT;
-						} else if (g.getDirection() != now && g.getDirection() == Direction.RIGHT) {
-							goRight();
-							now = Direction.RIGHT;
-						} else if(g.getDirection() != now && g.getDirection() == Direction.NONE) {
-							goStraight();
-							now = Direction.NONE;
-						}
+						getDirection();
 					}
 					handler.postDelayed(this, INTERVAL);
 				}
 			};
 			handler.postDelayed(runnable, INTERVAL);
 		} else {
-			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-			alertDialog.setTitle("B³¹d po³¹czenia");
-			alertDialog.setMessage("Brak po³¹czenia z serwerem gry.");
-			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					finish();
-				}
-			});
-			alertDialog.show();
+			Toast.makeText(this, "Nie uda³o siê po³¹czyæ z serwerem", Toast.LENGTH_LONG).show();
+			finish();
 		}
 	}
+	/**
+     * Geting actual direction and do some action
+     *
+     * @param void
+     * @return void
+     * @throws none
+     */	
+	private void getDirection() {
+		if (g.getDirection() != now && g.getDirection() == Direction.LEFT) {
+			goLeft();
+			now = Direction.LEFT;
+		} else if (g.getDirection() != now && g.getDirection() == Direction.RIGHT) {
+			goRight();
+			now = Direction.RIGHT;
+		} else if(g.getDirection() != now && g.getDirection() == Direction.NONE) {
+			goStraight();
+			now = Direction.NONE;	
+		}
+	}
+	
     /**
      * Called when turned left
      *

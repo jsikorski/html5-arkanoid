@@ -20,9 +20,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.codebutler.android_websockets.SocketIOClient;
-
 import android.util.Log;
+
+import com.codebutler.android_websockets.SocketIOClient;
 
 /**
  * @author Miko³aj Jankowski
@@ -31,7 +31,7 @@ import android.util.Log;
 public class ServerConnection {
 
 	protected static final String TAG = "ServerConnection.java";
-	private boolean isConnected = false;
+	private static boolean isConnected = false;
 	private SocketIOClient client;
 	
 	/**
@@ -56,6 +56,28 @@ public class ServerConnection {
 
 	}
 	
+    /**
+     * Waiting for connection to established
+     *
+     * @param void
+     * @return void
+     * @throws none
+     */
+	public void waitForConnection() {
+	    int count = 0;
+	    while(count < 20){
+	    	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+
+				e.printStackTrace();
+			}
+	    	if(isConnected())
+	    		count = 20;
+	    	else
+	    		count++;
+	    }
+	}
 	/**
      * Connecting to server
      *
@@ -64,19 +86,17 @@ public class ServerConnection {
      * @throws Connection error
      */
 	public void connect(String ip, String port) {
-		
-		Log.d("ServerConnection", "Start:connect()");
 
 		try {
 			final String adres = "http://" + ip + ":" + port;	
 			URI uri = URI.create(adres);
 			
 			client = new SocketIOClient(uri, new SocketIOClient.Handler() {
-			    
+
 				public void onConnect() {
+					Log.d(TAG, "Connected!");
+					pushStart();
 			    	isConnected = true;
-			    	pushStart();
-			        Log.d(TAG, "Connected!");
 			    }
 
 			    public void on(String event, JSONArray arguments) {
@@ -100,7 +120,6 @@ public class ServerConnection {
 			        isConnected = false;
 			    }
 			});
-			pushStart();
 		}
 		catch (Exception ex) {
 
@@ -119,8 +138,9 @@ public class ServerConnection {
 		if(isConnected) {
 			try {
 				JSONArray arguments = new JSONArray();		
-				//arguments.put("type");
-				arguments.put("move:"+msg);	
+				JSONObject object = new JSONObject();
+				object.put("type", "move:"+msg);
+				arguments.put(object);
 				
 				client.emit("message",arguments);
 			} catch (JSONException e) {
@@ -143,8 +163,9 @@ public class ServerConnection {
 	public boolean pushStart() {
 		try {
 			JSONArray arguments = new JSONArray();
-			//arguments.put("type");
-			arguments.put("start");	
+			JSONObject object = new JSONObject();
+			object.put("type", "start");
+			arguments.put(object);
 			
 			client.emit("message",arguments);
 		} catch (JSONException e) {
