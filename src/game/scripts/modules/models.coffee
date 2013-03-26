@@ -160,19 +160,15 @@ class Ball extends Model
 
 class TopEdge extends Model
 	constructor: (@width) ->
-		super()
 
 class RightEdge extends Model
 	constructor: (@x, @height) ->
-		super()
 
 class BottomEdge extends Model
 	constructor: (@y, @width) ->
-		super()
 
 class LeftEdge extends Model
 	constructor: (@height) ->
-		super()
 
 class EdgesBuilder
 	@buildFor: (boardWidth, boardHeight) ->
