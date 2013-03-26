@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+ <PreferenceCategory
+   android:summary="Ustawienia serwera"
+   android:title="Ustawienia serwera" >
+  <EditTextPreference
+     android:key="adres"
+     android:defaultValue="@string/address_default"
+     android:summary="Adres serwera"
+     android:title="Adres" />
+   <EditTextPreference
+     android:key="port"
+     android:defaultValue="@string/port_default"
+     android:summary="Numer portu"
+     android:title="Port" />
+ </PreferenceCategory>
+ <PreferenceCategory
+   android:summary="Ustawienia gry"
+   android:title="Ustawienia gry" >
+  <CheckBoxPreference
+    android:key="sound"
+    android:title="Dźwięk"
+    android:defaultValue="true" />
+   <CheckBoxPreference
+    android:key="vibrate"
+    android:title="Wibracje"
+    android:defaultValue="true" />
+   <CheckBoxPreference
+    android:key="forcefeedback"
+    android:title="ForceFeedback"
+    android:defaultValue="true" />
+ </PreferenceCategory>
+</PreferenceScreen>

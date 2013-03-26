@@ -7,6 +7,11 @@ class Mediator
 		@androidConnector = new AndroidConnector(@)
 		@htmlConnector = new HtmlConnector(@)
 	
+	notifyAndroidConnector: ->
+		@androidConnector.notify
+
+
+
 	
 	forewardMessage: (message, sender) ->
 		console.log 'forewarding'
@@ -19,6 +24,13 @@ class Mediator
 	
 class AndroidConnector
 	
+	constructor: (mediator) ->
+		@mediator = mediator
+		@io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
+		console.log 'Connected with Android application'
+		
+	notify: ->
+		@io.sockets.on('connection', (socket) ->
 	constructor: (med) ->
 		mediator = med
 		io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
@@ -44,6 +56,16 @@ class AndroidConnector
 			)
 
 			
+			socket.on('message', (message) 		
+				@mediator.forewardMessage(message, @)
+			)
+
+
+
+
+
+
+
 		)
 		
 		
@@ -56,6 +78,8 @@ class HtmlConnector
 
 	constructor: (med) ->
 		mediator = med
+		io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
+		console.log 'Connected with HTTP application'
 
 
 
@@ -63,11 +87,18 @@ class HtmlConnector
 		
 
 		io.sockets.on('connection', (socket) ->
+			console.log 'on connection'
+			mediator.notifyAndroidConnector
+		io.sockets.on('connection', (socket) ->
 			console.log 'Connected with HTTP application'
+
 			
 			
 			
 			#io.sockets.emit('message', {type : 'move:left'})
+			console.log 'message sent'
+			
+		)
 			#console.log 'message sent'
 			
 		)

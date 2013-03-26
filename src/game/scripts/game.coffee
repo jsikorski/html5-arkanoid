@@ -1,3 +1,7 @@
+class Board
+	@width: 500 #window.innerWidth
+	@height: 750 #window.innerHeight
+
 class Game
 	init: ->
 		pad = new Arkanoid.Models.Pad()
@@ -13,9 +17,11 @@ class Game
 	initGraphics: (pad, ball) ->
 		canvasContext = @createCanvasContext()
 		background = new Arkanoid.Models.Model()
+		background.width = Board.width
+		background.height = Board.height
 
 		elements = [
-			new Arkanoid.Graphics.Element(background, 'img/background.png')
+			new Arkanoid.Graphics.Element(background, 'img/background.jpg')
 			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
 			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
 		]
@@ -24,13 +30,23 @@ class Game
 
 	createCanvasContext: ->
 		canvas = document.createElement('canvas')
-		canvas.width = 498
-		canvas.height = 750
+		canvas.width = Board.width
+		canvas.height = Board.height
 		document.body.appendChild(canvas)
 		
 		canvas.getContext('2d')
 
 	initModels: (pad, ball) ->
+		edges = Arkanoid.Models.EdgesBuilder.buildFor(Board.width, Board.height)
+		
+		pad.addCollidingModels(edges)
+		ball.addCollidingModels(pad)
+		ball.addCollidingModels(edges)
+
+		offsetX = pad.width / 2 - ball.width / 2
+		offsetY = -ball.height
+		ball.bindPositionWith(pad, offsetX,  offsetY)
+
 		@modelsUpdater = new Arkanoid.Models.Updater([pad, ball])
 
 	initConnection: (client) ->
@@ -51,7 +67,7 @@ class Game
 
 		@renderer.render()
 		@then = now
-		
+
 		requestAnimationFrame(@mainLoop)
 
 	looseLife: ->

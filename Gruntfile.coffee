@@ -17,7 +17,7 @@ module.exports = (grunt) ->
 				files: [
 					expand: true
 					cwd: '<%= config.src_dir %>'
-					src: ['**/*.png', '**/*.html', '**/*.js'] 
+					src: ['**/*.png', '**/*.html', '**/*.jpg', '**/*.js'] 
 					dest: '<%= config.build_dir %>/'
 				]
 			release: 
@@ -25,7 +25,7 @@ module.exports = (grunt) ->
 					{
 						expand: true 
 						cwd: '<%= config.build_dir %>'
-						src: ['**/*.png', '**/*.html']
+						src: ['**/*.png', '**/*.html', '**/*.jpg']
 						dest: '<%= config.release_dir %>/'
 					},						
 					{

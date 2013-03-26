@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, arkanoidActivity!</string>
+    <string name="app_name">Arkanoid</string>
+    <string name="contentDiscription">disc</string>
+    <string name="newGameString">Nowa Gra</string>
+    
+    <string name="address_default">192.168.1.1</string>
+    <string name="port_default">8080</string>
+
+</resources>
