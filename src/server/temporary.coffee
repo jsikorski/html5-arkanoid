@@ -7,107 +7,69 @@ class Mediator
 		@androidConnector = new AndroidConnector(@)
 		@htmlConnector = new HtmlConnector(@)
 	
-	notifyAndroidConnector: ->
-		@androidConnector.notify
-
-
-
-	
 	forewardMessage: (message, sender) ->
-		console.log 'forewarding'
+		console.log 'Forewarding'
 		if sender instanceof AndroidConnector
-			console.log 'SEND TO HTML'
 			@htmlConnector.forewardMessage(message)
+		else if sender instanceof HtmlConnector
+			@androidConnector.forewardMessage(message)
 			
 		
 			
 	
 class AndroidConnector
 	
-	constructor: (mediator) ->
-		@mediator = mediator
-		@io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
-		console.log 'Connected with Android application'
-		
-	notify: ->
-		@io.sockets.on('connection', (socket) ->
 	constructor: (med) ->
 		mediator = med
 		io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
 
+		console.log '[Android] Waiting for connection'
+		
 		io.sockets.on('connection', (socket) ->
-			console.log 'Connected with Android application'
+			console.log '[Android] Connected'
 
 			#open = require('open')
 			#open('../game/game.html')
-
-			socket.on('message', (message) 	->
-				console.log "cokolwiek"
-				console.log message	
+			
+			#io.sockets.emit('message', {type : 'move:left'})
+			#console.log '[Android] Message sent'
+			
+			socket.on('message', (message) ->
+				console.log message
+				console.log message.type		
 				mediator.forewardMessage(message, @)
-
-			)
-
-			socket.on('anything', (message) 	->
-				console.log "cokolwiek"
-				console.log message	
-				mediator.forewardMessage(message, @)
-
 			)
 
 			
-			socket.on('message', (message) 		
-				@mediator.forewardMessage(message, @)
-			)
-
-
-
-
-
-
-
 		)
+
+	forewardMessage: (message) ->
+		console.log 'Sent to Android'
+		io.sockets.emit('message', message)
 		
 		
-	
-		
-		
-	
 
 class HtmlConnector
 
 	constructor: (med) ->
 		mediator = med
-		io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
-		console.log 'Connected with HTTP application'
-
-
 
 		io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
-		
+		console.log '[HTML] Waiting for connection'
 
-		io.sockets.on('connection', (socket) ->
-			console.log 'on connection'
-			mediator.notifyAndroidConnector
 		io.sockets.on('connection', (socket) ->
 			console.log 'Connected with HTTP application'
 
-			
-			
-			
-			#io.sockets.emit('message', {type : 'move:left'})
-			console.log 'message sent'
-			
-		)
-			#console.log 'message sent'
-			
+			socket.on('message', (message) ->
+				mediator.forewardMessage(message, @)
+			)
 		)
 		
 	forewardMessage: (message) ->
+		console.log 'Sent to HTML'
 		io.sockets.emit('message', message)
 
-
-	#	socket.emit('message', {type : 'move:left'})
+		#io.sockets.emit('message', {type : 'move:left'})
 	
 
 mediator = new Mediator()
