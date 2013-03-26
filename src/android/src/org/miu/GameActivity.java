@@ -39,10 +39,9 @@ public class GameActivity extends Activity {
 	private MySensor g;
 	private ServerConnection server;
 	private ImageView left, right;
-	private boolean stop;
 	private Direction now = Direction.NONE;
-	private Handler handler;
-	private Runnable runnable;
+	Handler handler;
+	Runnable runnable;
 
     /**
      * Called BackButton pressed
@@ -52,15 +51,9 @@ public class GameActivity extends Activity {
      * @throws none
      */
 	public void onBackPressed() {
-		if (g != null) {
-			stop = true;
-		}
 		if(server.isConnected()) {
 			server.disconnect();
-			server = null;
-			handler.removeCallbacks(runnable);
-		}
-		server = null;
+		}	
 		finish();
 	}
 
@@ -103,25 +96,32 @@ public class GameActivity extends Activity {
 		
 		if (server.isConnected()) {
 			g = new MySensor(this);
-			stop = false;
-
+			
 			handler = new Handler();
 			runnable = new Runnable() {
 				public void run() {
-					if (stop == true) {
+					if(!server.isConnected()) {
 						g.Stop();
-					} else {
-						getDirection();
+						finish();
+						toast("Po³¹czenie zerwane");
 					}
-					handler.postDelayed(this, INTERVAL);
+					else {
+						getDirection();
+						handler.postDelayed(this, INTERVAL);
+					}
 				}
 			};
 			handler.postDelayed(runnable, INTERVAL);
 		} else {
-			Toast.makeText(this, "Nie uda³o siê po³¹czyæ z serwerem", Toast.LENGTH_LONG).show();
+			toast("Nie uda³o siê po³¹czyæ z serwerem");
 			finish();
 		}
 	}
+	
+	private void toast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+	}
+	
 	/**
      * Geting actual direction and do some action
      *

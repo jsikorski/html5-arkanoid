@@ -113,10 +113,11 @@ public class ServerConnection {
 
 			    public void onDisconnect(int code, String reason) {
 			        Log.d(TAG, String.format("Disconnected! Code: %d Reason: %s", code, reason));
+			        isConnected = false;
 			    }
 
 			    public void onError(Exception error) {
-			        Log.e(TAG, "Error!", error);
+			        //Log.e(TAG, "Error!", error);
 			        isConnected = false;
 			    }
 			});
