@@ -1,20 +1,23 @@
 class Board
-	@width: 500 #window.innerWidth
-	@height: 750 #window.innerHeight
+	@width: window.innerWidth * 0.95
+	@height: window.innerHeight * 0.95
 
 class Game
 	init: ->
 		pad = new Arkanoid.Models.Pad()
 		ball = new Arkanoid.Models.Ball()
+		level = new Arkanoid.Models.Level()
 		client = new Arkanoid.Connection.WebSocketClient()
 
-		@initGraphics(pad, ball)
-		@initModels(pad, ball)
+		@initGraphics(pad, ball, level)
+		@initModels(pad, ball, level)
+
 		@initConnection(client)
 		@initControl(client)
+
 		@startMainLoop()
 
-	initGraphics: (pad, ball) ->
+	initGraphics: (pad, ball, level) ->
 		canvasContext = @createCanvasContext()
 		background = new Arkanoid.Models.Model()
 		background.width = Board.width
@@ -25,6 +28,7 @@ class Game
 			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
 			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
 		]
+		elements.push(new Arkanoid.Graphics.Element(target, 'img/target.png')) for target in level.getTargets()
 
 		@renderer = new Arkanoid.Graphics.Renderer(canvasContext, elements)
 
@@ -36,12 +40,14 @@ class Game
 		
 		canvas.getContext('2d')
 
-	initModels: (pad, ball) ->
+	initModels: (pad, ball, level) ->
 		edges = Arkanoid.Models.EdgesBuilder.buildFor(Board.width, Board.height)
 		
 		pad.addCollidingModels(edges)
 		ball.addCollidingModels(pad)
 		ball.addCollidingModels(edges)
+
+		ball.addCollidingModels(level.getTargets())
 
 		offsetX = pad.width / 2 - ball.width / 2
 		offsetY = -ball.height
@@ -72,4 +78,4 @@ class Game
 
 	looseLife: ->
 
-exportForModule 'Arkanoid', Game
+exportForModule 'Arkanoid', Board, Game

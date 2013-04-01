@@ -94,11 +94,11 @@ class Model
 		)
 
 class Pad extends Model
-	x 	 	: 200
-	y 		: 700
-	height 	: 60
-	width 	: 129
-	speed 	: 255
+	x 	 	: Arkanoid.Board.width / 2
+	y 		: Arkanoid.Board.height * 9/10
+	height 	: Arkanoid.Board.height /10
+	width 	: Arkanoid.Board.width / 10
+	speed 	: Arkanoid.Board.width / 2
 
 	update: (modifier, control)->
 		super()
@@ -119,10 +119,10 @@ class Pad extends Model
 		@leftCollisionDetected = true
 
 class Ball extends Model
-	x 		: 250
-	y 		: 660
-	height 	: 36
-	width 	: 38
+	x 		: Arkanoid.Board.width / 2
+	y 		: Arkanoid.Board.height * 9/10
+	height 	: Arkanoid.Board.height /30
+	width 	: Arkanoid.Board.height /30
 	velX	: 0
 	velY	: 0
 
@@ -132,14 +132,14 @@ class Ball extends Model
 		if control.isStartActive() and not @started
 			@started = true
 			control.reset('start')
-			@velX = 150
-			@velY = -150
+			@velX = Arkanoid.Board.width / 4
+			@velY = -Arkanoid.Board.width / 4
 			@unbindPosition()
 
 		@move(@velX * modifier, @velY * modifier) if @started
 
 	handleTopEdgeCollision: ->
-		@velY = -@velY
+		@velY = -@velY if @velY < 0
 
 	handleRightEdgeCollision: ->
 		@handleVerticalEdgeCollision()
@@ -155,6 +155,20 @@ class Ball extends Model
 
 	handlePadCollision: ->
 	 	@velY = -@velY if @velY > 0
+
+	handleTargetCollision: ->
+		@velY = -@velY # TODO
+
+class Target extends Model
+
+	height 	: Arkanoid.Board.height /30
+	width 	: Arkanoid.Board.width /9
+
+	constructor: (@x,@y) ->
+
+	handleBallCollision: ->
+		@isAlive = false
+
 
 ##### Edges #####
 
@@ -181,6 +195,48 @@ class EdgesBuilder
 
 ##### Services #####
 
+class Level
+	targets: []
+
+	constructor: ->
+		@targets = [
+			new Target(
+				Arkanoid.Board.width * 1/9,
+				Arkanoid.Board.height * 5/30
+				),
+			new Target(
+				Arkanoid.Board.width * 3/9,
+				Arkanoid.Board.height * 5/30
+				),
+			new Target(
+				Arkanoid.Board.width * 5/9,
+				Arkanoid.Board.height * 5/30
+				),
+			new Target(
+				Arkanoid.Board.width * 7/9,
+				Arkanoid.Board.height * 5/30
+				),
+			new Target(
+				Arkanoid.Board.width * 1/9,
+				Arkanoid.Board.height * 10/30
+				),
+			new Target(
+				Arkanoid.Board.width * 3/9,
+				Arkanoid.Board.height * 10/30
+				),
+			new Target(
+				Arkanoid.Board.width * 5/9,
+				Arkanoid.Board.height * 10/30
+				),
+			new Target(
+				Arkanoid.Board.width * 7/9,
+				Arkanoid.Board.height * 10/30
+				),
+		]
+
+	getTargets: ->
+		return @targets
+
 class Updater
 	models: []
 
@@ -194,4 +250,4 @@ class Updater
 		model.update(modifier, control) for model in @models	
 
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Updater
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, Updater
