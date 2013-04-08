@@ -161,10 +161,11 @@ class Ball extends Model
 
 class Target extends Model
 
-	height 	: Arkanoid.Board.height /30
+	height 	: Arkanoid.Board.height /20
 	width 	: Arkanoid.Board.width /9
 
 	constructor: (@x,@y) ->
+
 
 	handleBallCollision: ->
 		@isAlive = false
@@ -199,40 +200,15 @@ class Level
 	targets: []
 
 	constructor: ->
-		@targets = [
-			new Target(
-				Arkanoid.Board.width * 1/9,
-				Arkanoid.Board.height * 5/30
-				),
-			new Target(
-				Arkanoid.Board.width * 3/9,
-				Arkanoid.Board.height * 5/30
-				),
-			new Target(
-				Arkanoid.Board.width * 5/9,
-				Arkanoid.Board.height * 5/30
-				),
-			new Target(
-				Arkanoid.Board.width * 7/9,
-				Arkanoid.Board.height * 5/30
-				),
-			new Target(
-				Arkanoid.Board.width * 1/9,
-				Arkanoid.Board.height * 10/30
-				),
-			new Target(
-				Arkanoid.Board.width * 3/9,
-				Arkanoid.Board.height * 10/30
-				),
-			new Target(
-				Arkanoid.Board.width * 5/9,
-				Arkanoid.Board.height * 10/30
-				),
-			new Target(
-				Arkanoid.Board.width * 7/9,
-				Arkanoid.Board.height * 10/30
-				),
-		]
+	
+		@targets = new Array()
+		for i in [1..7]
+			for j in [1..6]
+				target = new Target(
+							Arkanoid.Board.width * (i)/9,
+							Arkanoid.Board.height * 2*(j)/30
+							)
+				@targets.push target
 
 	getTargets: ->
 		return @targets

@@ -1,17 +1,23 @@
 root = require '../common/config'
 
+
 class Mediator
 	
 	constructor: ->
 		console.log 'Mediator init'
 		@androidConnector = new AndroidConnector(@)
 		@htmlConnector = new HtmlConnector(@)
+
 	
 	forewardMessage: (message, sender) ->
+
 		console.log 'Forewarding'
-		if sender instanceof AndroidConnector
+
+		if sender == "Android"
+			console.log "forwarding to android"
 			@htmlConnector.forewardMessage(message)
-		else if sender instanceof HtmlConnector
+		else if sender == "Html"
+			console.log "forwarding to html"
 			@androidConnector.forewardMessage(message)
 			
 		
@@ -20,12 +26,13 @@ class Mediator
 class AndroidConnector
 	
 	constructor: (med) ->
+
 		mediator = med
-		io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
+		@io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
 
 		console.log '[Android] Waiting for connection'
 		
-		io.sockets.on('connection', (socket) ->
+		@io.sockets.on('connection', (socket) ->
 			console.log '[Android] Connected'
 
 			#open = require('open')
@@ -37,7 +44,7 @@ class AndroidConnector
 			socket.on('message', (message) ->
 				console.log message
 				console.log message.type		
-				mediator.forewardMessage(message, @)
+				mediator.forewardMessage(message, "Android")
 			)
 
 			
@@ -45,7 +52,7 @@ class AndroidConnector
 
 	forewardMessage: (message) ->
 		console.log 'Sent to Android'
-		io.sockets.emit('message', message)
+		@io.sockets.emit('message', message)
 		
 		
 
@@ -54,20 +61,20 @@ class HtmlConnector
 	constructor: (med) ->
 		mediator = med
 
-		io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
+		@io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
 		console.log '[HTML] Waiting for connection'
 
-		io.sockets.on('connection', (socket) ->
+		@io.sockets.on('connection', (socket) ->
 			console.log 'Connected with HTTP application'
 
 			socket.on('message', (message) ->
-				mediator.forewardMessage(message, @)
+				mediator.forewardMessage(message, "Html")
 			)
 		)
 		
 	forewardMessage: (message) ->
 		console.log 'Sent to HTML'
-		io.sockets.emit('message', message)
+		@io.sockets.emit('message', message)
 
 		#io.sockets.emit('message', {type : 'move:left'})
 	

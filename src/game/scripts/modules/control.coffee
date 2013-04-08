@@ -11,7 +11,7 @@ class ControlHandler
 		@activeMoves['start']?
 
 	reset: (stateName)->
-		delete @activeMoves['stateName']
+		delete @activeMoves[stateName]
 
 
 class KeyboardHandler extends ControlHandler

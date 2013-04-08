@@ -28,7 +28,7 @@ class Game
 			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
 			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
 		]
-		elements.push(new Arkanoid.Graphics.Element(target, 'img/target.png')) for target in level.getTargets()
+		elements.push(new Arkanoid.Graphics.Element(target, 'img/target3.png')) for target in level.getTargets()
 
 		@renderer = new Arkanoid.Graphics.Renderer(canvasContext, elements)
 
