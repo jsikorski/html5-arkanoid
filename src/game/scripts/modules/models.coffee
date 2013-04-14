@@ -138,6 +138,11 @@ class Ball extends Model
 
 		@move(@velX * modifier, @velY * modifier) if @started
 
+	reset: ->
+		@velX = 0
+		@velY = 0
+		@started = false
+
 	handleTopEdgeCollision: ->
 		@velY = -@velY if @velY < 0
 
@@ -148,7 +153,7 @@ class Ball extends Model
 		@velX = -@velX
 
 	handleBottomEdgeCollision: ->
-		@isAlive = false
+		@game.looseLife()
 
 	handleLeftEdgeCollision: ->
 		@handleVerticalEdgeCollision()
@@ -159,6 +164,9 @@ class Ball extends Model
 	handleTargetCollision: ->
 		@velY = -@velY # TODO
 
+	setGameHandler: (game) ->
+		@game = game
+
 class Target extends Model
 
 	height 	: Arkanoid.Board.height /20
@@ -166,10 +174,16 @@ class Target extends Model
 
 	constructor: (@x,@y) ->
 
-
 	handleBallCollision: ->
 		@isAlive = false
 
+
+class Life extends Model
+
+	height 	: Arkanoid.Board.height /20
+	width 	: Arkanoid.Board.width /20
+
+	constructor: (@x,@y) ->
 
 ##### Edges #####
 
@@ -213,6 +227,28 @@ class Level
 	getTargets: ->
 		return @targets
 
+class LivesCounter
+	lives: []
+
+	constructor: (livesAmount)->
+
+		@lives = new Array()
+		for i in [1..livesAmount]
+			life = new Life(
+						Arkanoid.Board.width * (i-1) /20,
+						Arkanoid.Board.height * 19 / 20
+						)
+			@lives.push life
+
+	getLives: ->
+		return @lives
+
+	popLife: ->
+		@lives.pop()
+
+	isEmpty: ->
+		return @lives.length == 0
+
 class Updater
 	models: []
 
@@ -226,4 +262,4 @@ class Updater
 		model.update(modifier, control) for model in @models	
 
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, Updater
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater

@@ -18,6 +18,14 @@ class Renderer
 	addElements: (elements) ->
 		@elements = @elements.concat(elements)
 
+	remove: (model) ->
+		for element in @elements
+			if (element.model == model)		
+				@elements.splice(@elements.indexOf(element),1)
+				return
+
+		
+
 	render: ->
 		element.render(@canvasContext) for element in @elements
 
