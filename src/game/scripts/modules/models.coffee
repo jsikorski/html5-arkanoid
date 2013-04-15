@@ -178,7 +178,6 @@ class Target extends Model
 		super()
 
 	handleBallCollision: ->
-		console.log("AAA")
 		@isAlive = false
 
 
@@ -188,6 +187,7 @@ class Life extends Model
 	width 	: Arkanoid.Board.width /20
 
 	constructor: (@x,@y) ->
+		super()
 
 ##### Edges #####
 
