@@ -33,6 +33,7 @@ public class ServerConnection {
 	protected static final String TAG = "ServerConnection.java";
 	private static boolean isConnected = false;
 	private SocketIOClient client;
+	public boolean started = false;
 	
 	/**
      * Returns true if connection established
@@ -95,7 +96,6 @@ public class ServerConnection {
 
 				public void onConnect() {
 					Log.d(TAG, "Connected!");
-					pushStart();
 			    	isConnected = true;
 			    }
 

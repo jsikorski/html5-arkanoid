@@ -23,8 +23,10 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -79,7 +81,20 @@ public class GameActivity extends Activity {
 		/** Keep screen on */
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.game);
+		
+		Button actionBtn = (Button) findViewById(R.id.actionBtn);
 
+		actionBtn.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+		    	if (server.isConnected()) {
+		    		if(!server.started) {
+		    			server.pushStart();
+		    			server.started = true;
+		    		}
+		    	}
+			}
+		});
+		
 		left = (ImageView) findViewById(R.id.arrowLeft);
 		right = (ImageView) findViewById(R.id.arrowRight);
 		
@@ -100,14 +115,14 @@ public class GameActivity extends Activity {
 			handler = new Handler();
 			runnable = new Runnable() {
 				public void run() {
-					if(!server.isConnected()) {
+					if(server.isConnected()) {
+						getDirection();
+						handler.postDelayed(this, INTERVAL);
+					}
+					else {
 						g.Stop();
 						finish();
 						toast("Po³¹czenie zerwane");
-					}
-					else {
-						getDirection();
-						handler.postDelayed(this, INTERVAL);
 					}
 				}
 			};
@@ -130,15 +145,19 @@ public class GameActivity extends Activity {
      * @throws none
      */	
 	private void getDirection() {
-		if (g.getDirection() != now && g.getDirection() == Direction.LEFT) {
-			goLeft();
-			now = Direction.LEFT;
-		} else if (g.getDirection() != now && g.getDirection() == Direction.RIGHT) {
-			goRight();
-			now = Direction.RIGHT;
-		} else if(g.getDirection() != now && g.getDirection() == Direction.NONE) {
-			goStraight();
-			now = Direction.NONE;	
+		if(now != g.getDirection()) {
+			if (g.getDirection() == Direction.LEFT) {
+				goStraight();
+				goLeft();
+				now = Direction.LEFT;
+			} else if (g.getDirection() == Direction.RIGHT) {
+				goStraight();
+				goRight();
+				now = Direction.RIGHT;
+			} else {
+				goStraight();
+				now = Direction.NONE;	
+			}
 		}
 	}
 	
@@ -150,11 +169,9 @@ public class GameActivity extends Activity {
      * @throws none
      */
 	private void goLeft() {
-		if(server.isConnected()) {
-			server.pushMove("left");
-			left.setImageResource(R.drawable.arrow_left_on);
-			right.setImageResource(R.drawable.arrow_right);
-		}
+		server.pushMove("left");
+		//left.setImageResource(R.drawable.arrow_left_on);
+		//right.setImageResource(R.drawable.arrow_right);
 	}
     /**
      * Called when turned right
@@ -164,11 +181,9 @@ public class GameActivity extends Activity {
      * @throws none
      */
 	private void goRight() {
-		if(server.isConnected()) {
-			server.pushMove("right");
-			right.setImageResource(R.drawable.arrow_right_on);
-			left.setImageResource(R.drawable.arrow_left);
-		}	
+		server.pushMove("right");
+		//right.setImageResource(R.drawable.arrow_right_on);
+		//left.setImageResource(R.drawable.arrow_left);
 	}
     /**
      * Called when not turned
@@ -178,10 +193,8 @@ public class GameActivity extends Activity {
      * @throws none
      */
 	private void goStraight() {
-		if(server.isConnected()) {
-			server.pushMove("reset");
-			left.setImageResource(R.drawable.arrow_left);
-			right.setImageResource(R.drawable.arrow_right);
-		}
+		server.pushMove("reset");
+		//left.setImageResource(R.drawable.arrow_left);
+		//right.setImageResource(R.drawable.arrow_right);
 	}
 }
