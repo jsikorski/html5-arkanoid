@@ -7,6 +7,7 @@ class Element
 		@img.onload = => @ready = true
 
 	render: (canvasContext) ->
+		return if !@model.isAlive
 		canvasContext.drawImage(@img, @model.x, @model.y, @model.width, @model.height) if @ready
 
 class Renderer

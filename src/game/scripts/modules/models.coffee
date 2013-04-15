@@ -5,10 +5,12 @@ class Model
 	y 		: 0
 	height 	: 0
 	width 	: 0
+
 	
 	constructor: ->
 		@potentiallyCollidingModels = []
 		@actuallyCollidingModels = []
+		@isAlive = true
 
 	move: (xDelta, yDelta) ->
 		return if @positionBinding
@@ -165,9 +167,11 @@ class Target extends Model
 	width 	: Arkanoid.Board.width /9
 
 	constructor: (@x,@y) ->
+		super()
 
 
 	handleBallCollision: ->
+		console.log("AAA")
 		@isAlive = false
 
 

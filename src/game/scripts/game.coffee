@@ -48,12 +48,14 @@ class Game
 		ball.addCollidingModels(edges)
 
 		ball.addCollidingModels(level.getTargets())
+		target.addCollidingModels(ball) for target in level.getTargets()
 
 		offsetX = pad.width / 2 - ball.width / 2
 		offsetY = -ball.height
 		ball.bindPositionWith(pad, offsetX,  offsetY)
 
-		@modelsUpdater = new Arkanoid.Models.Updater([pad, ball])
+		models = [pad, ball].concat(level.getTargets())
+		@modelsUpdater = new Arkanoid.Models.Updater(models)
 
 	initConnection: (client) ->
 		client.connect(Arkanoid.Config.serverAddress, Arkanoid.Config.httpPort)
