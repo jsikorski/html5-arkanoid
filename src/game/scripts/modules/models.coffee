@@ -56,7 +56,7 @@ class Model
 		modelTypeName = collidingModel.constructor.name
 		methodName = "handle#{modelTypeName}Collision"
 		method = @[methodName]
-		method.call(@) if method?
+		method.call(@,collidingModel) if method?
 
 	collides: (c) ->
 		(
@@ -117,10 +117,10 @@ class Pad extends Model
 		delete @rightCollisionDetected
 		delete @leftCollisionDetected
 
-	handleRightEdgeCollision: ->
+	handleRightEdgeCollision: (collidingModel) ->
 		@rightCollisionDetected = true
 
-	handleLeftEdgeCollision: ->
+	handleLeftEdgeCollision: (collidingModel) ->
 		@leftCollisionDetected = true
 
 class Ball extends Model
@@ -148,26 +148,23 @@ class Ball extends Model
 		@velY = 0
 		@started = false
 
-	handleTopEdgeCollision: ->
+	handleTopEdgeCollision: (collidingModel) ->
 		@velY = -@velY if @velY < 0
 
-	handleRightEdgeCollision: ->
-		@handleVerticalEdgeCollision()
-
-	handleVerticalEdgeCollision: ->
+	handleRightEdgeCollision: (collidingModel) ->
 		@velX = -@velX
 
-	handleBottomEdgeCollision: ->
+	handleBottomEdgeCollision: (collidingModel) ->
 		@game.looseLife()
 
-	handleLeftEdgeCollision: ->
-		@handleVerticalEdgeCollision()
+	handleLeftEdgeCollision: (collidingModel) ->
+		@velX = -@velX
 
-	handlePadCollision: ->
+	handlePadCollision: (collidingModel) ->
 	 	@velY = -@velY if @velY > 0
 
-	handleTargetCollision: (target) ->
-		# @ball.removeCollidingModel(target)
+	handleTargetCollision: (collidingModel) ->
+		@removeCollidingModel(collidingModel)
 		@velY = -@velY # TODO
 
 	setGameHandler: (game) ->
@@ -184,7 +181,7 @@ class Target extends Model
 	constructor: (@x,@y) ->
 		super()
 
-	handleBallCollision: ->
+	handleBallCollision: (collidingModel) ->
 		@game.hitTarget(@)
 		@isAlive = false
 
