@@ -30,6 +30,9 @@ class Model
 		models = [models] if not _.isArray(models)
 		@potentiallyCollidingModels = @potentiallyCollidingModels.concat(models)
 
+	removeCollidingModel: (model) ->
+		@potentiallyCollidingModels.splice(@potentiallyCollidingModels.indexOf(model))	
+
 	update: ->
 		@handlePositionBinding()
 		@checkCollisions()
@@ -163,7 +166,8 @@ class Ball extends Model
 	handlePadCollision: ->
 	 	@velY = -@velY if @velY > 0
 
-	handleTargetCollision: ->
+	handleTargetCollision: (target) ->
+		# @ball.removeCollidingModel(target)
 		@velY = -@velY # TODO
 
 	setGameHandler: (game) ->
@@ -174,12 +178,15 @@ class Target extends Model
 	height 	: Arkanoid.Board.height /20
 	width 	: Arkanoid.Board.width /9
 
+	setGameHandler: (game) ->
+		@game = game
+
 	constructor: (@x,@y) ->
 		super()
 
 	handleBallCollision: ->
+		@game.hitTarget(@)
 		@isAlive = false
-
 
 class Life extends Model
 
@@ -262,8 +269,20 @@ class Updater
 	addModels: (models)  ->
 		@models = @models.concat(models)
 
-	update: (modifier, control) ->
-		model.update(modifier, control) for model in @models	
+	remove: (m) ->
+		@models.splice(@models.indexOf(m),1)
 
+	update: (modifier, control) ->
+		model.update(modifier, control) for model in @models
+
+		temp = new Array()
+
+		for m in @models
+			if (not m.isAlive) 
+				temp.push(m)
+
+		for m in temp
+			@remove(m)
+		
 
 exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater

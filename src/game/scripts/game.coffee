@@ -53,6 +53,7 @@ class Game
 
 		ball.addCollidingModels(level.getTargets())
 		target.addCollidingModels(ball) for target in level.getTargets()
+		target.setGameHandler(@) for target in level.getTargets()
 
 		offsetX = pad.width / 2 - ball.width / 2
 		offsetY = -ball.height
@@ -93,5 +94,7 @@ class Game
 			offsetY = -@ball.height
 			@ball.bindPositionWith(@pad, offsetX,  offsetY)
 
+	hitTarget: (target) ->
+		@renderer.remove(target)
 
 exportForModule 'Arkanoid', Board, Game

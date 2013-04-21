@@ -24,9 +24,7 @@ class Renderer
 			if (element.model == model)		
 				@elements.splice(@elements.indexOf(element),1)
 				return
-
-		
-
+				
 	render: ->
 		element.render(@canvasContext) for element in @elements
 
