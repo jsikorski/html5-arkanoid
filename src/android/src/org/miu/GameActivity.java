@@ -14,8 +14,6 @@
 package org.miu;
 
 import org.miu.MySensor.Direction;
-import org.miu.R;
-import org.miu.MySensor;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -26,7 +24,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -36,14 +34,15 @@ import android.widget.Toast;
  */
 public class GameActivity extends Activity {
 
-	private final static int INTERVAL = 1;
+	private final static int INTERVAL = 100;
 
 	private MySensor g;
 	private ServerConnection server;
 	private ImageView left, right;
 	private Direction now = Direction.NONE;
-	Handler handler;
-	Runnable runnable;
+	private int leftImg, rightImg, offImg;
+	private Handler handler;
+	private Runnable runnable;
 
     /**
      * Called BackButton pressed
@@ -72,7 +71,7 @@ public class GameActivity extends Activity {
 
 		/** Orientation - always Landscape */
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+		
 		/** Full screen */
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -82,14 +81,19 @@ public class GameActivity extends Activity {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.game);
 		
-		Button actionBtn = (Button) findViewById(R.id.actionBtn);
+		final ImageButton actionBtn = (ImageButton) findViewById(R.id.actionBtn);
 
+		leftImg = R.drawable.arrow_left_on;
+		rightImg = R.drawable.arrow_right_on;
+		offImg = R.drawable.arrow_off;
+		
 		actionBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 		    	if (server.isConnected()) {
 		    		if(!server.started) {
 		    			server.pushStart();
 		    			server.started = true;
+		    			actionBtn.setImageResource(R.drawable.button);
 		    		}
 		    	}
 			}
@@ -145,19 +149,22 @@ public class GameActivity extends Activity {
      * @throws none
      */	
 	private void getDirection() {
-		if(now != g.getDirection()) {
-			if (g.getDirection() == Direction.LEFT) {
+		Direction get = g.getDirection();
+		
+		if(now != get) {
+			if (get == Direction.LEFT) {
 				goStraight();
 				goLeft();
 				now = Direction.LEFT;
-			} else if (g.getDirection() == Direction.RIGHT) {
+			} else if (get == Direction.RIGHT) {
 				goStraight();
 				goRight();
 				now = Direction.RIGHT;
 			} else {
 				goStraight();
 				now = Direction.NONE;	
-			}
+				System.gc();
+			}				
 		}
 	}
 	
@@ -170,8 +177,7 @@ public class GameActivity extends Activity {
      */
 	private void goLeft() {
 		server.pushMove("left");
-		//left.setImageResource(R.drawable.arrow_left_on);
-		//right.setImageResource(R.drawable.arrow_right);
+		left.setImageResource(leftImg);
 	}
     /**
      * Called when turned right
@@ -182,8 +188,7 @@ public class GameActivity extends Activity {
      */
 	private void goRight() {
 		server.pushMove("right");
-		//right.setImageResource(R.drawable.arrow_right_on);
-		//left.setImageResource(R.drawable.arrow_left);
+		right.setImageResource(rightImg);
 	}
     /**
      * Called when not turned
@@ -194,7 +199,7 @@ public class GameActivity extends Activity {
      */
 	private void goStraight() {
 		server.pushMove("reset");
-		//left.setImageResource(R.drawable.arrow_left);
-		//right.setImageResource(R.drawable.arrow_right);
+		left.setImageResource(offImg);
+		right.setImageResource(offImg);
 	}
 }

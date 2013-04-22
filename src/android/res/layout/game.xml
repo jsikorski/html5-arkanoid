@@ -1,30 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout1"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TableLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:gravity="fill"
-    android:orientation="horizontal" >
-
-    <ImageView
-        android:id="@+id/arrowLeft"
-        android:layout_width="100dip"
-        android:layout_height="100dip"
-        android:contentDescription="@+string/contentText"
-        android:src="@drawable/arrow_left" />
-
-    <Button
-        android:id="@+id/actionBtn"
+    android:gravity="fill" >
+    
+    <TableRow
+        android:id="@+id/tableRow1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Button" />
+        android:padding="5dip" >
 
-    <ImageView
-        android:id="@+id/arrowRight"
-        android:layout_width="100dip"
-        android:layout_height="100dip"
-        android:contentDescription="@+string/contentText"
-        android:src="@drawable/arrow_right" />
+        <TextView
+            android:id="@+id/pointsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pointsLabelText"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-</LinearLayout>
+        <android.widget.Space
+            android:id="@+id/space1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </TableRow>   
+   
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+    	<ImageView
+    	    android:id="@+id/arrowLeft"
+    	    android:layout_width="100dip"
+    	    android:layout_height="100dip"
+    	    android:contentDescription="@+string/contentText"
+    	    android:src="@drawable/arrow_off" />
+
+    	<ImageButton
+        	android:id="@+id/actionBtn"
+        	android:layout_width="0dip"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:background="@null"
+        	android:src="@drawable/start_btn"
+        	android:contentDescription="@+string/contentText" />
+
+    	<ImageView
+    	    android:id="@+id/arrowRight"
+    	    android:layout_width="100dip"
+    	    android:layout_height="100dip"
+    	    android:contentDescription="@+string/contentText"
+    	    android:src="@drawable/arrow_off" />
+
+    </TableRow>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/life1"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:contentDescription="@+string/contentText"
+                android:src="@drawable/life" />
+
+            <ImageView
+                android:id="@+id/life2"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:contentDescription="@+string/contentText"
+                android:src="@drawable/life" />
+
+            <ImageView
+                android:id="@+id/life3"
+                android:layout_width="50dip"
+                android:layout_height="wrap_content"
+                android:contentDescription="@+string/contentText"
+                android:src="@drawable/life" />
+
+        </LinearLayout>
+
+</TableLayout>
