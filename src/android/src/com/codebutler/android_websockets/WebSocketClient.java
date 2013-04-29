@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
+//import android.util.Log;
 import org.apache.http.*;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.message.BasicLineParser;
@@ -28,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class WebSocketClient {
-    private static final String TAG = "WebSocketClient";
+    //private static final String TAG = "WebSocketClient";
 
     private URI                      mURI;
     private Listener                 mListener;
@@ -124,12 +124,12 @@ public class WebSocketClient {
                     mParser.start(stream);
 
                 } catch (EOFException ex) {
-                    Log.d(TAG, "WebSocket EOF!", ex);
+                    //Log.d(TAG, "WebSocket EOF!", ex);
                     mListener.onDisconnect(0, "EOF");
 
                 } catch (SSLException ex) {
                     // Connection reset by peer
-                    Log.d(TAG, "Websocket SSL error!", ex);
+                    //Log.d(TAG, "Websocket SSL error!", ex);
                     mListener.onDisconnect(0, "SSL");
 
                 } catch (Exception ex) {
@@ -148,7 +148,7 @@ public class WebSocketClient {
                         mSocket.close();
                         mSocket = null;
                     } catch (IOException ex) {
-                        Log.d(TAG, "Error while disconnecting", ex);
+                        //Log.d(TAG, "Error while disconnecting", ex);
                         mListener.onError(ex);
                     }
                 }

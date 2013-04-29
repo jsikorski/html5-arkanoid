@@ -28,7 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 /**
  * @author Miko³aj Jankowski
@@ -36,7 +36,7 @@ import android.widget.Button;
  */
 public class MainActivity extends Activity {
 
-	private Button newGameButton;
+	private ImageButton newGameButton;
 
 	public boolean oneTimeLoadActivity = false;
 
@@ -127,7 +127,7 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.main);
 		
-		newGameButton = (Button) findViewById(R.id.newGameButton);
+		newGameButton = (ImageButton) findViewById(R.id.newGameButton);
 
 		newGameButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

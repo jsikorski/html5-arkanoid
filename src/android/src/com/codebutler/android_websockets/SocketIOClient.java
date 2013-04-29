@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
 import android.os.Looper;
-import android.util.Log;
+//import android.util.Log;
 
 public class SocketIOClient {
     public static interface Handler {
@@ -37,7 +37,7 @@ public class SocketIOClient {
         public void onError(Exception error);
     }
 
-    private static final String TAG = "SocketIOClient";
+    //private static final String TAG = "SocketIOClient";
     
     String mURL;
     Handler mHandler;
@@ -86,7 +86,7 @@ public class SocketIOClient {
         final JSONObject event = new JSONObject();
         event.put("args", args);
         event.put("name", name);
-        Log.d(TAG, "Emitting event: " + event.toString());
+        //Log.d(TAG, "Emitting event: " + event.toString());
         mSendHandler.post(new Runnable() {
             public void run() {
                 mClient.send(String.format("5:::%s", event.toString()));
@@ -122,7 +122,7 @@ public class SocketIOClient {
 
             public void onMessage(String message) {
                 try {
-                    Log.d(TAG, "Message: " + message);
+                    //Log.d(TAG, "Message: " + message);
                     String[] parts = message.split(":", 4);
                     int code = Integer.parseInt(parts[0]);
                     switch (code) {
@@ -242,11 +242,11 @@ public class SocketIOClient {
 
     private void cleanup() {
         mClient.disconnect();
-        mClient = null;
+        //mClient = null;
        
-        //mSendLooper.quit();
-        mSendLooper = null;
-        mSendHandler = null;
+        mSendLooper.quit();
+        //mSendLooper = null;
+        //mSendHandler = null;
     }
 
     public void connect() {

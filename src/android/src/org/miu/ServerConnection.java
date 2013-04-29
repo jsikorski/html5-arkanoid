@@ -34,6 +34,7 @@ public class ServerConnection {
 	private static boolean isConnected = false;
 	private SocketIOClient client;
 	public boolean started = false;
+
 	
 	/**
      * Returns true if connection established
@@ -117,7 +118,7 @@ public class ServerConnection {
 			    }
 
 			    public void onError(Exception error) {
-			        //Log.e(TAG, "Error!", error);
+			        Log.e(TAG, "Error!", error);
 			        isConnected = false;
 			    }
 			});
@@ -163,7 +164,7 @@ public class ServerConnection {
 	 */	
 	public boolean pushStart() {
 		try {
-			JSONArray arguments = new JSONArray();
+			JSONArray arguments = new JSONArray();		
 			JSONObject object = new JSONObject();
 			object.put("type", "start");
 			arguments.put(object);
