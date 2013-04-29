@@ -164,11 +164,104 @@ class Ball extends Model
 	 	@velY = -@velY if @velY > 0
 
 	handleTargetCollision: (collidingModel) ->
+
+		side = @collidingSide(collidingModel)
+		switch side
+			when 2 then @velY = -@velY if (@velY > 0)
+			when 8 then @velY = -@velY if (@velY < 0) 
+			when 4 then @velX = -@velX if (@velX > 0) 
+			when 6 then @velX = -@velX if (@velX < 0) 
+			when 1 
+			 	if (@velX > 0)
+			 		@velX = -@velX
+			 	if (@velY > 0)
+			 		@velY = -@velY
+			 when 3 
+			 	if (@velX < 0)
+			 		@velX = -@velX
+			 	if (@velY > 0)
+			 		@velY = -@velY
+			 when 5 then @velY = -@velY
+			 when 7 
+			 	if (@velX > 0)
+			 		@velX = -@velX
+			 	if (@velY < 0)
+			 		@velY = -@velY
+			 when 9
+			 	if (@velX < 0)
+			 		@velX = -@velX
+			 	if (@velY < 0)
+			 		@velY = -@velY
+
 		@removeCollidingModel(collidingModel)
-		@velY = -@velY # TODO
+		
 
 	setGameHandler: (game) ->
 		@game = game
+
+# colliding sides map:
+# 	1 2 3
+#   4 5 6
+#	7 8 9
+	collidingSide: (c) ->
+		if (@inLowerBound(c,'x') and @inLowerBound(c,'y'))
+			return 1
+		if (@inside(c,'x') and @inLowerBound(c,'y'))
+			return 2
+		if (@inHigherBound(c,'x') and @inLowerBound(c,'y'))
+			return 3
+		if (@inLowerBound(c,'x') and @inside(c,'y'))
+			return 4
+		if (@inside(c,'x') and @inside(c,'y'))
+			return 5
+		if (@inHigherBound(c,'x') and @inside(c,'y'))
+			return 6	
+		if (@inLowerBound(c,'x') and @inHigherBound(c,'y'))
+			return 7
+		if (@inside(c,'x') and @inHigherBound(c,'y'))
+			return 8
+		if (@inHigherBound(c,'x') and @inHigherBound(c,'y'))
+			return 9	
+
+
+	inLowerBound:(c,axis) ->
+		if (axis == 'x')
+			return (
+				(@x < c.x) and
+				(@x + @width >= c.x)
+			)
+		else if (axis == 'y')
+			return (
+				(@y < c.y) and
+				(@y + @height >= c.y)
+			)
+
+	inside:(c,axis) ->
+		if (axis == 'x')
+			return (
+				(@x > c.x) and 
+				(@x + @width < c.x + c.width)
+			)
+		else if (axis == 'y')
+			return (
+				(@y > c.y) and 
+				(@y + @height < c.y + c.height)
+			)
+
+	inHigherBound:(c,axis) ->
+		if (axis == 'x')
+			return (
+				(@x > c.x) and
+				(@x < c.x + c.width) and
+				(@x + @width >= c.x + c.width)
+			)
+		else if (axis == 'y')
+			return (
+				(@y > c.y) and
+				(@y < c.y + c.height) and
+				(@y + @height >= c.y + c.height)
+			)
+						
 
 class Target extends Model
 
