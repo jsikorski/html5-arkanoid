@@ -31,7 +31,7 @@ class Model
 		@potentiallyCollidingModels = @potentiallyCollidingModels.concat(models)
 
 	removeCollidingModel: (model) ->
-		@potentiallyCollidingModels.splice(@potentiallyCollidingModels.indexOf(model))	
+		@potentiallyCollidingModels.splice(@potentiallyCollidingModels.indexOf(model),1)	
 
 	update: ->
 		@handlePositionBinding()
@@ -137,7 +137,7 @@ class Ball extends Model
 		if control.isStartActive() and not @started
 			@started = true
 			control.reset('start')
-			@velX = Arkanoid.Board.width / 4
+			@velX = Arkanoid.Board.width / 4 
 			@velY = -Arkanoid.Board.width / 4
 			@unbindPosition()
 
@@ -222,7 +222,6 @@ class Level
 	targets: []
 
 	constructor: ->
-	
 		@targets = new Array()
 		for i in [1..7]
 			for j in [1..6]
