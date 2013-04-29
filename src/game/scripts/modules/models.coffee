@@ -92,6 +92,9 @@ class Model
 					(@y >= c.y) and 
 					(@y + @height <= c.y + c.height)
 				)
+			)and 
+			(
+				c.isAlive
 			)
 		)
 
@@ -176,9 +179,13 @@ class Target extends Model
 
 	constructor: (@x,@y) ->
 		super()
+		@isHit = false
 
 	handleBallCollision: ->
-		@isAlive = false
+		@isHit = true
+		
+	
+		
 
 
 class Life extends Model
@@ -193,15 +200,19 @@ class Life extends Model
 
 class TopEdge extends Model
 	constructor: (@width) ->
+		super()
 
 class RightEdge extends Model
 	constructor: (@x, @height) ->
+		super()
 
 class BottomEdge extends Model
 	constructor: (@y, @width) ->
+		super()
 
 class LeftEdge extends Model
 	constructor: (@height) ->
+		super()
 
 class EdgesBuilder
 	@buildFor: (boardWidth, boardHeight) ->
