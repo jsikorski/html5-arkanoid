@@ -52,8 +52,9 @@ class Game
 		ball.setGameHandler(@)
 
 		ball.addCollidingModels(level.getTargets())
-		target.addCollidingModels(ball) for target in level.getTargets()
-		target.setGameHandler(@) for target in level.getTargets()
+		for target in level.getTargets()
+			target.addCollidingModels(ball)
+			target.setGameHandler(@) 
 
 		offsetX = pad.width / 2 - ball.width / 2
 		offsetY = -ball.height
