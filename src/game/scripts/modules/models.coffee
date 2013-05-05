@@ -175,28 +175,29 @@ class Ball extends Model
 			when 4 then @velX = -@velX if (@velX > 0) 
 			when 6 then @velX = -@velX if (@velX < 0) 
 			when 1 
-			 	if (@velX > 0)
-			 		@velX = -@velX
-			 	if (@velY > 0)
-			 		@velY = -@velY
-			 when 3 
-			 	if (@velX < 0)
-			 		@velX = -@velX
-			 	if (@velY > 0)
-			 		@velY = -@velY
-			 when 5 then @velY = -@velY
-			 when 7 
-			 	if (@velX > 0)
-			 		@velX = -@velX
-			 	if (@velY < 0)
-			 		@velY = -@velY
-			 when 9
-			 	if (@velX < 0)
-			 		@velX = -@velX
-			 	if (@velY < 0)
-			 		@velY = -@velY
+				if (@velX > 0)
+					@velX = -@velX
+				if (@velY > 0)
+					@velY = -@velY
+			when 3 
+				if (@velX < 0)
+					@velX = -@velX
+				if (@velY > 0)
+					@velY = -@velY
+			when 5 then @velY = -@velY
+			when 7 
+				if (@velX > 0)
+					@velX = -@velX
+				if (@velY < 0)
+					@velY = -@velY
+			when 9
+				if (@velX < 0)
+					@velX = -@velX
+				if (@velY < 0)
+					@velY = -@velY
 
 		@removeCollidingModel(collidingModel)
+		@game.hitTarget(collidingModel)
 		
 
 	setGameHandler: (game) ->
@@ -279,8 +280,7 @@ class Target extends Model
 		@isHit = false
 
 	handleBallCollision: (collidingModel) ->
-		@game.hitTarget(@)
-		@isAlive = false
+		
 
 class Life extends Model
 
