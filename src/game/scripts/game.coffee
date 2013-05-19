@@ -27,7 +27,7 @@ class Game
 
 		elements = [
 			new Arkanoid.Graphics.Element(background, 'img/background.jpg')
-			new Arkanoid.Graphics.Element(pad, 'img/pad.png'),
+			new Arkanoid.Graphics.Element(pad, 'img/pad2.png'),
 			new Arkanoid.Graphics.Element(ball, 'img/ball.png')
 		]
 		elements.push(new Arkanoid.Graphics.Element(life, 'img/life.png')) for life in livesCounter.getLives()
@@ -95,6 +95,7 @@ class Game
 			offsetY = -@ball.height
 			@ball.bindPositionWith(@pad, offsetX,  offsetY)
 		else 
+			@renderer.remove(@ball)
 			gameOver = new Arkanoid.Models.Popup()
 			@modelsUpdater.addModels(gameOver)
 			@renderer.addElements(new Arkanoid.Graphics.Element(gameOver, 'img/gameOver.png'))

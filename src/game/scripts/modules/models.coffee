@@ -103,8 +103,8 @@ class Model
 
 class Pad extends Model
 	x 	 	: Arkanoid.Board.width / 2
-	y 		: Arkanoid.Board.height * 9/10
-	height 	: Arkanoid.Board.height /10
+	y 		: Arkanoid.Board.height * 19/20
+	height 	: Arkanoid.Board.height /20
 	width 	: Arkanoid.Board.width / 10
 	speed 	: Arkanoid.Board.width / 2
 
@@ -164,7 +164,23 @@ class Ball extends Model
 		@velX = -@velX
 
 	handlePadCollision: (collidingModel) ->
-	 	@velY = -@velY if @velY > 0
+		padCenter = ((collidingModel.width/2) + collidingModel.x)
+		ballCenter = (@width/2) + @x
+
+		xModifierPercentage = (ballCenter - padCenter)/collidingModel.width
+
+		xModifier = 0
+		if (@velX > 0) 
+			xModifier = @velX
+		else 
+			xModifier = -@velX
+
+		xModifier = xModifier * xModifierPercentage
+
+		if (xModifierPercentage > 0.5 or xModifierPercentage < -0.5)
+			@velX = @velX + xModifier
+		if @velY > 0
+			@velY = -@velY
 
 	handleTargetCollision: (collidingModel) ->
 
