@@ -290,6 +290,17 @@ class Life extends Model
 	constructor: (@x,@y) ->
 		super()
 
+class Popup extends Model
+	y 	: Arkanoid.Board.height /3
+	x 	: Arkanoid.Board.width /3
+	height 	: Arkanoid.Board.height /3
+	width 	: Arkanoid.Board.width /3
+
+	update: (modifier, control)->
+			super()
+			if control.isStartActive()
+				location.reload()
+
 ##### Edges #####
 
 class TopEdge extends Model
@@ -327,13 +338,16 @@ class Level
 		for i in [1..7]
 			for j in [1..6]
 				target = new Target(
-							Arkanoid.Board.width * (i)/9,
-							Arkanoid.Board.height * 2*(j)/30
-							)
+						Arkanoid.Board.width * (i)/9,
+						Arkanoid.Board.height * 2*(j)/30
+						)
 				@targets.push target
 
 	getTargets: ->
 		return @targets
+
+	remove: (target) ->
+		@targets.splice(@targets.indexOf(target),1)
 
 class LivesCounter
 	lives: []
@@ -382,4 +396,4 @@ class Updater
 			@remove(m)
 		
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater, Popup

@@ -94,8 +94,19 @@ class Game
 			offsetX = @pad.width / 2 - @ball.width / 2
 			offsetY = -@ball.height
 			@ball.bindPositionWith(@pad, offsetX,  offsetY)
+		else 
+			gameOver = new Arkanoid.Models.Popup()
+			@modelsUpdater.addModels(gameOver)
+			@renderer.addElements(new Arkanoid.Graphics.Element(gameOver, 'img/gameOver.png'))
 
 	hitTarget: (target) ->
 		@renderer.remove(target)
+		@level.remove(target)
+		if (@level.getTargets().length == 0)
+			@ball.velX = 0
+			@ball.velY = 0
+			youWon = new Arkanoid.Models.Popup()
+			@modelsUpdater.addModels(youWon)
+			@renderer.addElements(new Arkanoid.Graphics.Element(youWon, 'img/youWon.png'))
 
 exportForModule 'Arkanoid', Board, Game
