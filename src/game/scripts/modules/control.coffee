@@ -40,6 +40,8 @@ class KeyboardHandler extends ControlHandler
 
 class ServerHandler extends ControlHandler
 	constructor: (webSocketClient) ->
+		@webSocketClient = webSocketClient
+
 		webSocketClient.on("move:left", => 
 			@reset('right')
 			@activeMoves['left'] = true
@@ -59,6 +61,9 @@ class ServerHandler extends ControlHandler
 			@reset('right')
 		)
 
+	vibrate: ->
+		webSocketClient.emit('message', { fb: 'vibrate' })
+
 
 class Facade
 	controlHandlers: []
@@ -68,6 +73,7 @@ class Facade
 			new KeyboardHandler(),
 			new ServerHandler(webSocketClient)
 		)
+		@serverHandler = new ServerHandler(webSocketClient)
 
 	isLeftActive: ->
 		_.some(@controlHandlers, (handler) -> handler.isLeftActive())
@@ -83,5 +89,6 @@ class Facade
 	
 	vibrate: ->
 		console.log "VIBRATE"
+		@serverHandler.vibrate()
 
 exportForModule 'Arkanoid.Control', Facade
