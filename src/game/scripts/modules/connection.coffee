@@ -10,7 +10,7 @@ class WebSocketClient
 		handler.callback(message) for handler in @handlers when handler.messageType is messageType
 		console.log message
 		console.log message.type
-
+		
 	on: (messageType, callback) ->
 		handler = 
 			messageType : messageType

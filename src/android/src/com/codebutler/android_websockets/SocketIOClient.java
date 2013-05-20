@@ -16,11 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.TargetApi;
 import android.net.http.AndroidHttpClient;
-import android.os.Build;
 import android.os.Looper;
-//import android.util.Log;
+import android.util.Log;
 
 public class SocketIOClient {
     public static interface Handler {
@@ -37,7 +35,7 @@ public class SocketIOClient {
         public void onError(Exception error);
     }
 
-    //private static final String TAG = "SocketIOClient";
+    private static final String TAG = "SocketIOClient";
     
     String mURL;
     Handler mHandler;
@@ -51,8 +49,7 @@ public class SocketIOClient {
         mHandler = handler;
     }
 
-    @TargetApi(Build.VERSION_CODES.FROYO)
-	private static String downloadUriAsString(final HttpUriRequest req) throws IOException {
+    private static String downloadUriAsString(final HttpUriRequest req) throws IOException {
         AndroidHttpClient client = AndroidHttpClient.newInstance("android-websockets");
         try {
             HttpResponse res = client.execute(req);
@@ -84,9 +81,9 @@ public class SocketIOClient {
 
     public void emit(String name, JSONArray args) throws JSONException {
         final JSONObject event = new JSONObject();
-        event.put("args", args);
         event.put("name", name);
-        //Log.d(TAG, "Emitting event: " + event.toString());
+        event.put("args", args);
+        Log.d(TAG, "Emitting event: " + event.toString());
         mSendHandler.post(new Runnable() {
             public void run() {
                 mClient.send(String.format("5:::%s", event.toString()));
@@ -122,7 +119,7 @@ public class SocketIOClient {
 
             public void onMessage(String message) {
                 try {
-                    //Log.d(TAG, "Message: " + message);
+                    Log.d(TAG, "Message: " + message);
                     String[] parts = message.split(":", 4);
                     int code = Integer.parseInt(parts[0]);
                     switch (code) {

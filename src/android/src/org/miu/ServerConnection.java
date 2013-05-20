@@ -15,6 +15,8 @@ package org.miu;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Connection;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,9 +35,27 @@ public class ServerConnection {
 	protected static final String TAG = "ServerConnection.java";
 	private static boolean isConnected = false;
 	private SocketIOClient client;
-	public boolean started = false;
+	private boolean lifeLost = false;
+	private boolean forceFeedBack = false;
+	private final ReentrantLock lock = new ReentrantLock();
 
+	public boolean isLifeLost() {
+		if(lifeLost){
+			lifeLost = false;
+			return true;
+		}
+		else
+			return false;
+	}
 	
+	public boolean isforceFeedBack() {
+		if(forceFeedBack){
+			forceFeedBack = false;
+			return true;
+		}
+		else
+			return false;
+	}
 	/**
      * Returns true if connection established
      *
@@ -105,6 +125,15 @@ public class ServerConnection {
 			    }
 
 			    public void onJSON(JSONObject json) {
+			    	try {
+						if(json.getString("type") == "ff")
+							forceFeedBack = true;
+						else if(json.getString("type") == "ll")
+							lifeLost = true;
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+			    	
 			        Log.d(TAG, String.format("Got JSON Object: %s", json.toString()));
 			    }
 
@@ -138,16 +167,18 @@ public class ServerConnection {
      */
 	public boolean pushMove(String msg) {
 		if(isConnected) {
+			lock.lock();
 			try {
 				JSONArray arguments = new JSONArray();		
 				JSONObject object = new JSONObject();
 				object.put("type", "move:"+msg);
 				arguments.put(object);
-				
 				client.emit("message",arguments);
-			} catch (JSONException e) {
+			} catch (Exception e) {
 				Log.d(TAG, "Error sending JSON - MOVE");
 				return false;
+			} finally {
+				lock.unlock();
 			}
 			
 			return true;
@@ -163,6 +194,7 @@ public class ServerConnection {
 	 * @throws Connection error
 	 */	
 	public boolean pushStart() {
+		lock.lock();
 		try {
 			JSONArray arguments = new JSONArray();		
 			JSONObject object = new JSONObject();
@@ -170,9 +202,11 @@ public class ServerConnection {
 			arguments.put(object);
 			
 			client.emit("message",arguments);
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			Log.d(TAG, "Error sending JSON - START");
 			return false;
+		} finally {
+			lock.unlock();
 		}
 		
 		return true;
@@ -190,7 +224,7 @@ public class ServerConnection {
 			try {
 				client.disconnect();
 			} catch (IOException e) {
-
+				Log.d("Disconnect error", e.getMessage());
 			}
 			return true;
 		}

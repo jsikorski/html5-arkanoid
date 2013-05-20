@@ -181,7 +181,8 @@ class Ball extends Model
 			@velX = @velX + xModifier
 		if @velY > 0
 			@velY = -@velY
-
+			@game.hitPad()
+		
 	handleTargetCollision: (collidingModel) ->
 
 		side = @collidingSide(collidingModel)

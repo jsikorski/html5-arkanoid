@@ -109,5 +109,7 @@ class Game
 			youWon = new Arkanoid.Models.Popup()
 			@modelsUpdater.addModels(youWon)
 			@renderer.addElements(new Arkanoid.Graphics.Element(youWon, 'img/youWon.png'))
-
+	
+	hitPad: ->
+		console.log "VIBRATE"
 exportForModule 'Arkanoid', Board, Game

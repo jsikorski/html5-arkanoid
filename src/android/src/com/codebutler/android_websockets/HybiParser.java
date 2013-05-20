@@ -30,14 +30,14 @@
 
 package com.codebutler.android_websockets;
 
-//import android.util.Log;
+import android.util.Log;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
 public class HybiParser {
-    //private static final String TAG = "HybiParser";
+    private static final String TAG = "HybiParser";
 
     private WebSocketClient mClient;
 
@@ -298,7 +298,7 @@ public class HybiParser {
             mClient.sendFrame(frame(payload, OP_PONG, -1));
 
         } else if (opcode == OP_PONG) {
-            //String message = encode(payload);
+            String message = encode(payload);
             // FIXME: Fire callback...
             //Log.d(TAG, "Got pong! " + message);
         }

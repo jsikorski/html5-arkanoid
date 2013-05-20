@@ -41,10 +41,12 @@ class KeyboardHandler extends ControlHandler
 class ServerHandler extends ControlHandler
 	constructor: (webSocketClient) ->
 		webSocketClient.on("move:left", => 
+			@reset('right')
 			@activeMoves['left'] = true
 		)
 		
 		webSocketClient.on("move:right", => 
+			@reset('left')
 			@activeMoves['right'] = true
 		)
 
@@ -78,5 +80,8 @@ class Facade
 
 	reset: (stateName)->
 		handler.reset(stateName) for handler in @controlHandlers
+	
+	vibrate: ->
+		console.log "VIBRATE"
 
 exportForModule 'Arkanoid.Control', Facade

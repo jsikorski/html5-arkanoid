@@ -14,10 +14,10 @@ class Mediator
 		console.log 'Forewarding'
 
 		if sender == "Android"
-			console.log "forwarding to android"
+			#console.log "forwarding to android"
 			@htmlConnector.forewardMessage(message)
 		else if sender == "Html"
-			console.log "forwarding to html"
+			#console.log "forwarding to html"
 			@androidConnector.forewardMessage(message)
 			
 		
@@ -30,10 +30,10 @@ class AndroidConnector
 		mediator = med
 		@io = require('socket.io').listen(root.Arkanoid.Config.androidPort)
 
-		console.log '[Android] Waiting for connection'
+		#console.log '[Android] Waiting for connection'
 		
 		@io.sockets.on('connection', (socket) ->
-			console.log '[Android] Connected'
+			#console.log '[Android] Connected'
 
 			#open = require('open')
 			#open('../game/game.html')
@@ -42,8 +42,8 @@ class AndroidConnector
 			#console.log '[Android] Message sent'
 			
 			socket.on('message', (message) ->
-				console.log message
-				console.log message.type		
+				#console.log message
+				#console.log message.type		
 				mediator.forewardMessage(message, "Android")
 			)
 
@@ -51,7 +51,7 @@ class AndroidConnector
 		)
 
 	forewardMessage: (message) ->
-		console.log 'Sent to Android'
+		#console.log 'Sent to Android'
 		@io.sockets.emit('message', message)
 		
 		
@@ -62,10 +62,10 @@ class HtmlConnector
 		mediator = med
 
 		@io = require('socket.io').listen(root.Arkanoid.Config.httpPort)
-		console.log '[HTML] Waiting for connection'
+		#console.log '[HTML] Waiting for connection'
 
 		@io.sockets.on('connection', (socket) ->
-			console.log 'Connected with HTTP application'
+			#console.log 'Connected with HTTP application'
 
 			socket.on('message', (message) ->
 				mediator.forewardMessage(message, "Html")
@@ -73,7 +73,7 @@ class HtmlConnector
 		)
 		
 	forewardMessage: (message) ->
-		console.log 'Sent to HTML'
+		#console.log 'Sent to HTML'
 		@io.sockets.emit('message', message)
 
 		#io.sockets.emit('message', {type : 'move:left'})

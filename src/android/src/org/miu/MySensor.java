@@ -26,7 +26,7 @@ import android.hardware.SensorManager;
 public class MySensor implements SensorEventListener {
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
-	private final float bound = 2;
+	private final float bound = 4;
 	private Direction dir = Direction.NONE;
 	private float axis = 0;
    
@@ -38,11 +38,9 @@ public class MySensor implements SensorEventListener {
      * @throws none
      */
 	public MySensor(Context c) {
-		mSensorManager = (SensorManager) c
-				.getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mSensorManager.registerListener(this, mSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
 	}
 
 	public enum Direction {

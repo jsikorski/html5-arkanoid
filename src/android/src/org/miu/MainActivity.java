@@ -32,7 +32,7 @@ import android.widget.ImageButton;
 
 /**
  * @author Miko³aj Jankowski
- *
+ * 
  */
 public class MainActivity extends Activity {
 
@@ -40,24 +40,25 @@ public class MainActivity extends Activity {
 
 	public boolean oneTimeLoadActivity = false;
 
-    /**
-     * Called when BackButton pressed
-     *
-     * @param void
-     * @return void
-     * @throws none
-     */
+	/**
+	 * Called when BackButton pressed
+	 * 
+	 * @param void
+	 * @return void
+	 * @throws none
+	 */
 	public void onBackPressed() {
 		return;
 	}
 
-    /**
-     * Menu constructor
-     *
-     * @param Menu menu
-     * @return void
-     * @throws none
-     */
+	/**
+	 * Menu constructor
+	 * 
+	 * @param Menu
+	 *            menu
+	 * @return void
+	 * @throws none
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -65,13 +66,14 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-    /**
-     * Menu actions
-     *
-     * @param MenuItem item
-     * @return boolean (always true)
-     * @throws none
-     */
+	/**
+	 * Menu actions
+	 * 
+	 * @param MenuItem
+	 *            item
+	 * @return boolean (always true)
+	 * @throws none
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -104,13 +106,13 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-    /**
-     * Called when activity first started
-     *
-     * @param savedInstanceState
-     * @return void
-     * @throws none
-     */
+	/**
+	 * Called when activity first started
+	 * 
+	 * @param savedInstanceState
+	 * @return void
+	 * @throws none
+	 */
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -126,12 +128,13 @@ public class MainActivity extends Activity {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		setContentView(R.layout.main);
-		
+
 		newGameButton = (ImageButton) findViewById(R.id.newGameButton);
 
 		newGameButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent i = new Intent(getBaseContext(),org.miu.GameActivity.class);
+				Intent i = new Intent(getBaseContext(),
+						org.miu.GameActivity.class);
 				startActivity(i);
 			}
 		});
