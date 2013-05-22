@@ -4,12 +4,12 @@ class WebSocketClient
 	connect: (serverAddress, serverPort) ->
 		@connection = io.connect(serverAddress + ":" + serverPort)
 		@connection.on('message', @handleMessage)
-
+		
 	handleMessage: (message, callback) =>
 		messageType = message.type
 		handler.callback(message) for handler in @handlers when handler.messageType is messageType
-		console.log message
-		console.log message.type
+		#console.log message
+		#console.log message.type
 		
 	on: (messageType, callback) ->
 		handler = 
@@ -24,5 +24,7 @@ class WebSocketClient
 		return if handlerIndex is -1
 		@handlers.splice(handlerIndex, 1)
 
+	send: (message) ->
+		@connection.emit('message', { type: message })
 
 exportForModule 'Arkanoid.Connection', WebSocketClient

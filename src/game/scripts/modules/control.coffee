@@ -61,8 +61,8 @@ class ServerHandler extends ControlHandler
 			@reset('right')
 		)
 
-	vibrate: ->
-		webSocketClient.emit('message', { fb: 'vibrate' })
+	vibrate: (message) ->
+		@webSocketClient.send(message)
 
 
 class Facade
@@ -87,8 +87,7 @@ class Facade
 	reset: (stateName)->
 		handler.reset(stateName) for handler in @controlHandlers
 	
-	vibrate: ->
-		console.log "VIBRATE"
-		@serverHandler.vibrate()
+	vibrate: (message) ->
+		@serverHandler.vibrate(message)
 
 exportForModule 'Arkanoid.Control', Facade

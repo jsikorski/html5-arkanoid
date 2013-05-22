@@ -19,10 +19,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.miu.MySensor.Direction;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -39,12 +41,10 @@ import android.widget.Toast;
 public class GameActivity extends Activity {
 
 	private final static int INTERVAL = 10;
-
+	private Vibrator v;
 	private MySensor g;
 	private ServerConnection server;
-	private ImageView left, right;
 	private Direction now = Direction.NONE;
-	private int leftImg, rightImg, offImg;
 	private Handler handler;
 	private Runnable runnable;
 	private boolean started = false;
@@ -96,10 +96,8 @@ public class GameActivity extends Activity {
 		lifeImage[1] = (ImageView) findViewById(R.id.life2);
 		lifeImage[2] = (ImageView) findViewById(R.id.life3);
 
-		leftImg = R.drawable.arrow_left_on;
-		rightImg = R.drawable.arrow_right_on;
-		offImg = R.drawable.arrow_off;
-
+		v =  (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+		
 		actionBtn.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (server.isConnected()) {
@@ -111,9 +109,6 @@ public class GameActivity extends Activity {
 				}
 			}
 		});
-
-		left = (ImageView) findViewById(R.id.arrowLeft);
-		right = (ImageView) findViewById(R.id.arrowRight);
 
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
@@ -136,7 +131,7 @@ public class GameActivity extends Activity {
 					if (server.isConnected()) {
 							try {
 								if(server.isforceFeedBack())
-									Log.d("FF", "FF");
+									v.vibrate(50);
 								else if(server.isLifeLost())
 									lifeLost();
 							} catch (IOException e) {
@@ -171,6 +166,8 @@ public class GameActivity extends Activity {
 	 * @throws none
 	 */
 	private void lifeLost() throws IOException {
+		Log.d("LIFE LOST", "LIFE LOST");
+		
 		if (lifes > 1) {
 			lifeImage[lifes - 1].setImageDrawable(null);
 			lifes--;
@@ -230,9 +227,8 @@ public class GameActivity extends Activity {
 	 */
 	private void goLeft() throws InterruptedException {
 		lock.lock();
-		//server.pushMove("reset");
+		server.pushMove("reset");
 		server.pushMove("left");
-		//left.setImageResource(leftImg);
 		lock.unlock();
 	}
 
@@ -246,9 +242,7 @@ public class GameActivity extends Activity {
 	 */
 	private void goRight() throws InterruptedException {
 		lock.lock();
-		//server.pushMove("reset");
 		server.pushMove("right");
-		//right.setImageResource(rightImg);
 		lock.unlock();
 	}
 
@@ -262,8 +256,6 @@ public class GameActivity extends Activity {
 	private void goStraight() {
 		lock.lock();
 		server.pushMove("reset");
-		//left.setImageResource(offImg);
-		//right.setImageResource(offImg);
 		lock.unlock();
 	}
 }

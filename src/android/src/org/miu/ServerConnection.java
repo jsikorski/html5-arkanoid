@@ -28,7 +28,7 @@ import com.codebutler.android_websockets.SocketIOClient;
 
 /**
  * @author Miko³aj Jankowski
- *
+ * 
  */
 public class ServerConnection {
 
@@ -40,187 +40,197 @@ public class ServerConnection {
 	private final ReentrantLock lock = new ReentrantLock();
 
 	public boolean isLifeLost() {
-		if(lifeLost){
+		if (lifeLost) {
 			lifeLost = false;
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
-	
+
 	public boolean isforceFeedBack() {
-		if(forceFeedBack){
+		if (forceFeedBack) {
 			forceFeedBack = false;
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
+
 	/**
-     * Returns true if connection established
-     *
-     * @param  void
-     * @return boolean
-     * @throws none
-     */
+	 * Returns true if connection established
+	 * 
+	 * @param void
+	 * @return boolean
+	 * @throws none
+	 */
 	public boolean isConnected() {
 		return isConnected;
 	}
-	
+
 	/**
-     * Constructor
-     *
-     * @param  String (adres of server)
-     * @return void
-     * @throws none
-     */
+	 * Constructor
+	 * 
+	 * @param String
+	 *            (adres of server)
+	 * @return void
+	 * @throws none
+	 */
 	public ServerConnection() {
 
 	}
-	
-    /**
-     * Waiting for connection to established
-     *
-     * @param void
-     * @return void
-     * @throws none
-     */
+
+	/**
+	 * Waiting for connection to established
+	 * 
+	 * @param void
+	 * @return void
+	 * @throws none
+	 */
 	public void waitForConnection() {
-	    int count = 0;
-	    while(count < 20){
-	    	try {
+		int count = 0;
+		while (count < 20) {
+			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();
 			}
-	    	if(isConnected())
-	    		count = 20;
-	    	else
-	    		count++;
-	    }
+			if (isConnected())
+				count = 20;
+			else
+				count++;
+		}
 	}
+
 	/**
-     * Connecting to server
-     *
-     * @param  String (adres of server)
-     * @return void
-     * @throws Connection error
-     */
+	 * Connecting to server
+	 * 
+	 * @param String
+	 *            (adres of server)
+	 * @return void
+	 * @throws Connection
+	 *             error
+	 */
 	public void connect(String ip, String port) {
 
 		try {
-			final String adres = "http://" + ip + ":" + port;	
+			final String adres = "http://" + ip + ":" + port;
 			URI uri = URI.create(adres);
-			
+
 			client = new SocketIOClient(uri, new SocketIOClient.Handler() {
 
 				public void onConnect() {
 					Log.d(TAG, "Connected!");
-			    	isConnected = true;
-			    }
+					isConnected = true;
+				}
 
-			    public void on(String event, JSONArray arguments) {
-			        Log.d(TAG, String.format("Got event %s: %s", event, arguments.toString()));
-			    }
+				public void on(String event, JSONArray arguments) {
+					try {
+						String arg = arguments.getJSONObject(0).getString("type").toString();
 
-			    public void onJSON(JSONObject json) {
-			    	try {
-						if(json.getString("type") == "ff")
-							forceFeedBack = true;
-						else if(json.getString("type") == "ll")
+						if (arg.equals("looseLife")) {
 							lifeLost = true;
+						} else if (arg.equals("force"))
+							forceFeedBack = true;
+
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
-			    	
-			        Log.d(TAG, String.format("Got JSON Object: %s", json.toString()));
-			    }
+				}
 
-			    public void onMessage(String message) {
-			        Log.d(TAG, String.format("Got message: %s", message));
-			    }
+				public void onJSON(JSONObject json) {
+					Log.d(TAG,
+							String.format("Got JSON Object: %s",
+									json.toString()));
+				}
 
-			    public void onDisconnect(int code, String reason) {
-			        Log.d(TAG, String.format("Disconnected! Code: %d Reason: %s", code, reason));
-			        isConnected = false;
-			    }
+				public void onMessage(String message) {
+					Log.d(TAG, String.format("Got message: %s", message));
+				}
 
-			    public void onError(Exception error) {
-			        Log.e(TAG, "Error!", error);
-			        isConnected = false;
-			    }
+				public void onDisconnect(int code, String reason) {
+					Log.d(TAG, String.format(
+							"Disconnected! Code: %d Reason: %s", code, reason));
+					isConnected = false;
+				}
+
+				public void onError(Exception error) {
+					Log.e(TAG, "Error!", error);
+					isConnected = false;
+				}
 			});
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 
 		}
 		client.connect();
 	}
 
 	/**
-     * Push move to server
-     *
-     * @param  String (message)
-     * @return boolean (true if pushed)
-     * @throws Connection error
-     */
+	 * Push move to server
+	 * 
+	 * @param String
+	 *            (message)
+	 * @return boolean (true if pushed)
+	 * @throws Connection
+	 *             error
+	 */
 	public boolean pushMove(String msg) {
-		if(isConnected) {
+		if (isConnected) {
 			lock.lock();
 			try {
-				JSONArray arguments = new JSONArray();		
+				JSONArray arguments = new JSONArray();
 				JSONObject object = new JSONObject();
-				object.put("type", "move:"+msg);
+				object.put("type", "move:" + msg);
 				arguments.put(object);
-				client.emit("message",arguments);
+				client.emit("message", arguments);
 			} catch (Exception e) {
 				Log.d(TAG, "Error sending JSON - MOVE");
 				return false;
 			} finally {
 				lock.unlock();
 			}
-			
+
 			return true;
 		}
-		return false;	
+		return false;
 	}
-	
+
 	/**
 	 * Push start JSON to server
-	 *
-	 * @param  void
+	 * 
+	 * @param void
 	 * @return boolean (true if pushed)
-	 * @throws Connection error
-	 */	
+	 * @throws Connection
+	 *             error
+	 */
 	public boolean pushStart() {
 		lock.lock();
 		try {
-			JSONArray arguments = new JSONArray();		
+			JSONArray arguments = new JSONArray();
 			JSONObject object = new JSONObject();
 			object.put("type", "start");
 			arguments.put(object);
-			
-			client.emit("message",arguments);
+
+			client.emit("message", arguments);
 		} catch (Exception e) {
 			Log.d(TAG, "Error sending JSON - START");
 			return false;
 		} finally {
 			lock.unlock();
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Disconnect from server
-	 *
-	 * @param  void
+	 * 
+	 * @param void
 	 * @return boolean (true if disconnected)
-	 * @throws Connection error
-	 */		
+	 * @throws Connection
+	 *             error
+	 */
 	public boolean disconnect() {
-		if(isConnected) {
+		if (isConnected) {
 			try {
 				client.disconnect();
 			} catch (IOException e) {

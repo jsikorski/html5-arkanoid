@@ -87,6 +87,8 @@ class Game
 	looseLife: ->
 		@renderer.remove(@livesCounter.popLife())
 
+		@control.vibrate('looseLife')
+		
 		if (!@livesCounter.isEmpty())
 
 			@ball.reset()
@@ -111,5 +113,6 @@ class Game
 			@renderer.addElements(new Arkanoid.Graphics.Element(youWon, 'img/youWon.png'))
 	
 	hitPad: ->
-		console.log "VIBRATE"
+		@control.vibrate('force')
+
 exportForModule 'Arkanoid', Board, Game
