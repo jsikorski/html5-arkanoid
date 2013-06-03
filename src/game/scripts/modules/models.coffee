@@ -224,8 +224,6 @@ class Ball extends Model
 					@velX = -@velX
 				if (@velY < 0)
 					@velY = -@velY
-
-		@removeCollidingModel(collidingModel)
 		@game.hitTarget(collidingModel)
 		
 
@@ -309,6 +307,10 @@ class Target extends Model
 		super()
 		@isHit = false
 
+	handleBulletCollision: (collidingModel) ->
+		@game.hitTarget(@)
+		@game.deleteBullet(collidingModel)
+
 class Life extends Model
 
 	height 	: Arkanoid.Board.height /20
@@ -359,14 +361,6 @@ class Bullet extends Model
 
 		if (@y < 0)
 			@isAlive = false
-
-	handleTargetCollision: (collidingModel) ->
-		@isAlive = false
-		@game.hitTarget(collidingModel)
-		@game.deleteBullet(@)
-
-	setGameHandler: (game) ->
-		@game = game
 
 ##### Edges #####
 

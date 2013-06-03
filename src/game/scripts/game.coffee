@@ -104,6 +104,7 @@ class Game
 			@renderer.addElements(new Arkanoid.Graphics.Element(gameOver, 'img/gameOver.png'))
 
 	hitTarget: (target) ->
+		@ball.removeCollidingModel(target)
 		@renderer.remove(target)
 		@level.remove(target)
 		if (@level.getTargets().length == 0)
@@ -121,6 +122,7 @@ class Game
 
 	deleteBullet: (bullet) ->
 		@renderer.remove(bullet)
+		bullet.isAlive = false
 
 	getPowerUp: (powerUp) ->
 		@renderer.remove(powerUp)
@@ -133,8 +135,6 @@ class Game
 		@renderer.addElements(new Arkanoid.Graphics.Element(@pad, 'img/pad2.png'))
 
 		bullet = new Arkanoid.Models.Bullet(pad)
-		bullet.setGameHandler(@)
-		
 		bullet.addCollidingModels(@level.getTargets())
 		for target in @level.getTargets()
 			target.addCollidingModels(bullet)
