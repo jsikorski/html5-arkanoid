@@ -105,8 +105,9 @@ class Pad extends Model
 	x 	 	: Arkanoid.Board.width / 2
 	y 		: Arkanoid.Board.height * 19/20
 	height 	: Arkanoid.Board.height /20
-	width 	: Arkanoid.Board.width / 10
+	width 	: Arkanoid.Board.width / 8
 	speed 	: Arkanoid.Board.width / 2
+	canShoot: false
 
 	update: (modifier, control)->
 		super()
@@ -117,6 +118,10 @@ class Pad extends Model
 		if control.isLeftActive() and not @leftCollisionDetected
 			@move(-@speed * modifier, 0)
 
+		if control.isStartActive() and @canShoot
+			@game.shoot(@)
+			@canShoot = false
+
 		delete @rightCollisionDetected
 		delete @leftCollisionDetected
 
@@ -125,6 +130,13 @@ class Pad extends Model
 
 	handleLeftEdgeCollision: (collidingModel) ->
 		@leftCollisionDetected = true
+
+	handlePowerUpCollision: (collidingModel) ->
+		@canShoot = true
+		@game.getPowerUp(collidingModel)
+
+	setGameHandler: (game) ->
+		@game = game
 
 class Ball extends Model
 	x 		: Arkanoid.Board.width / 2
@@ -288,6 +300,7 @@ class Target extends Model
 
 	height 	: Arkanoid.Board.height /20
 	width 	: Arkanoid.Board.width /9
+	hasPowerUp : false
 
 	setGameHandler: (game) ->
 		@game = game
@@ -295,9 +308,6 @@ class Target extends Model
 	constructor: (@x,@y) ->
 		super()
 		@isHit = false
-
-	handleBallCollision: (collidingModel) ->
-		
 
 class Life extends Model
 
@@ -317,6 +327,46 @@ class Popup extends Model
 			super()
 			if control.isStartActive()
 				location.reload()
+
+class PowerUp extends Model
+	height 	: Arkanoid.Board.height /20
+	width 	: Arkanoid.Board.width /40
+	velY	: Arkanoid.Board.height / 4
+
+	constructor: (target) ->
+		super()
+		@x = target.x + target.width/2
+		@y = target.y + target.height/2
+
+	update: (modifier, control)->
+		@move(0,  @velY * modifier)
+
+		if (@y > Arkanoid.Board.height)
+			@isAlive = false
+
+class Bullet extends Model
+	height 	: Arkanoid.Board.height /20
+	width 	: Arkanoid.Board.width /40
+	velY	: -Arkanoid.Board.height / 4
+
+	constructor: (pad) ->
+		super()
+		@x = pad.x + pad.width/2
+		@y = pad.y - pad.height/2
+
+	update: (modifier, control)->
+		@move(0,  @velY * modifier)
+
+		if (@y < 0)
+			@isAlive = false
+
+	handleTargetCollision: (collidingModel) ->
+		@isAlive = false
+		@game.hitTarget(collidingModel)
+		@game.deleteBullet(@)
+
+	setGameHandler: (game) ->
+		@game = game
 
 ##### Edges #####
 
@@ -358,6 +408,8 @@ class Level
 						Arkanoid.Board.width * (i)/9,
 						Arkanoid.Board.height * 2*(j)/30
 						)
+				if (i==j)
+					target.hasPowerUp = true
 				@targets.push target
 
 	getTargets: ->
@@ -413,4 +465,4 @@ class Updater
 			@remove(m)
 		
 
-exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater, Popup
+exportForModule 'Arkanoid.Models', Model, Pad, Ball, EdgesBuilder, Level, LivesCounter, Updater, Popup, PowerUp, Bullet

@@ -47,6 +47,7 @@ class Game
 		edges = Arkanoid.Models.EdgesBuilder.buildFor(Board.width, Board.height)
 		
 		pad.addCollidingModels(edges)
+		pad.setGameHandler(@)
 		ball.addCollidingModels(pad)
 		ball.addCollidingModels(edges)
 		ball.setGameHandler(@)
@@ -111,7 +112,36 @@ class Game
 			youWon = new Arkanoid.Models.Popup()
 			@modelsUpdater.addModels(youWon)
 			@renderer.addElements(new Arkanoid.Graphics.Element(youWon, 'img/youWon.png'))
-	
+		else if (target.hasPowerUp)
+			powerUp = new Arkanoid.Models.PowerUp(target)
+			
+			@modelsUpdater.addModels(powerUp)
+			@renderer.addElements(new Arkanoid.Graphics.Element(powerUp, 'img/powerup.png'))
+			@pad.addCollidingModels(powerUp)
+
+	deleteBullet: (bullet) ->
+		@renderer.remove(bullet)
+
+	getPowerUp: (powerUp) ->
+		@renderer.remove(powerUp)
+
+		@renderer.remove(@pad)
+		@renderer.addElements(new Arkanoid.Graphics.Element(@pad, 'img/pad3.png'))
+
+	shoot: (pad) ->
+		@renderer.remove(@pad)
+		@renderer.addElements(new Arkanoid.Graphics.Element(@pad, 'img/pad2.png'))
+
+		bullet = new Arkanoid.Models.Bullet(pad)
+		bullet.setGameHandler(@)
+		
+		bullet.addCollidingModels(@level.getTargets())
+		for target in @level.getTargets()
+			target.addCollidingModels(bullet)
+
+		@modelsUpdater.addModels(bullet)
+		@renderer.addElements(new Arkanoid.Graphics.Element(bullet, 'img/bullet.png'))
+
 	hitPad: ->
 		@control.vibrate('force')
 
