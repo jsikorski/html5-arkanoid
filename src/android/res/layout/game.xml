@@ -11,20 +11,6 @@
         android:layout_height="wrap_content"
         android:padding="5dip" >
 
-        <ImageView
-            android:id="@+id/bulletImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/bullet" 
-            android:contentDescription="@+string/contentText" />
-
-        <TextView
-            android:id="@+id/bulletsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pointsLabelText"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
         <android.widget.Space
             android:id="@+id/space1"
             android:layout_width="wrap_content"

@@ -191,7 +191,7 @@ public class ServerConnection {
 							lifeLost = true;
 						else if (arg.equals("force"))
 							forceFeedBack = true;
-						else if (arg.equals("shoot")) // Odebranie wiadomoœci od serwera o mo¿liwoœci strza³u
+						else if (arg.equals("powerup"))
 							shoot = true;
 
 					} catch (JSONException e) {

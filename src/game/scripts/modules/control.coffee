@@ -60,7 +60,11 @@ class ServerHandler extends ControlHandler
 			@reset('left')
 			@reset('right')
 		)
-
+		
+		webSocketClient.on("shoot", =>  
+			@activeMoves['start'] = true
+		)
+		
 		webSocketClient.on("restart", =>
 			location.reload()
 		)
@@ -91,7 +95,7 @@ class Facade
 	reset: (stateName)->
 		handler.reset(stateName) for handler in @controlHandlers
 	
-	vibrate: (message) ->
-		@serverHandler.vibrate(message)
+	sendMessage: (message) ->
+		@serverHandler.sendMessage(message)
 
 exportForModule 'Arkanoid.Control', Facade

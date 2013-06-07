@@ -23,12 +23,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -46,11 +46,10 @@ public class GameActivity extends Activity {
 	private Runnable runnable;
 	private boolean started = false;
 	private int lifes = 3;
-	private int shoots = 0;
+	private boolean shoots = false;
 	private ImageView[] lifeImage;
 	private ImageButton actionBtn;
 	private boolean vibrate = false;
-	private TextView bullets;
 	/**
 	 * Called BackButton pressed
 	 * 
@@ -93,7 +92,6 @@ public class GameActivity extends Activity {
 		lifeImage[0] = (ImageView) findViewById(R.id.life1);
 		lifeImage[1] = (ImageView) findViewById(R.id.life2);
 		lifeImage[2] = (ImageView) findViewById(R.id.life3);
-		bullets = (TextView) findViewById(R.id.bulletsLabel);
 
 		v =  (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -101,17 +99,16 @@ public class GameActivity extends Activity {
 			public void onClick(View v) {
 				if (server.isConnected()) {
 					if (!started) {
+						Log.d("Send", "Start");
 						server.pushStart();
 						started = true;
 						actionBtn.setImageResource(R.drawable.button);
 					}
-					else if(shoots > 0){
+					else if(shoots){
+						Log.d("Send", "Shoot");
+						shoots = false;
 						server.pushShoot();
-						shoots --;
-						bullets.setText(String.valueOf(shoots));
-						
-						if(shoots == 0)
-							actionBtn.setImageResource(R.drawable.button);
+						actionBtn.setImageResource(R.drawable.button);
 					}
 				}
 			}
@@ -174,8 +171,7 @@ public class GameActivity extends Activity {
 
 	
 	private void addShoots(){
-		shoots++;
-		bullets.setText(String.valueOf(shoots));
+		shoots = true;
 		actionBtn.setImageResource(R.drawable.fire);
 	}
 	/**

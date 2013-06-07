@@ -23,21 +23,20 @@ public final class R {
         public static final int start_btn=0x7f020009;
     }
     public static final class id {
-        public static final int LinearLayout1=0x7f07000a;
+        public static final int LinearLayout1=0x7f070008;
         public static final int TableLayout1=0x7f070000;
-        public static final int aboutMenu=0x7f07000d;
-        public static final int actionBtn=0x7f070006;
-        public static final int bulletImage=0x7f070002;
-        public static final int bulletsLabel=0x7f070003;
-        public static final int exitMenu=0x7f07000e;
-        public static final int life1=0x7f070007;
-        public static final int life2=0x7f070008;
-        public static final int life3=0x7f070009;
-        public static final int newGameButton=0x7f07000b;
-        public static final int settingsMenu=0x7f07000c;
-        public static final int space1=0x7f070004;
+        public static final int aboutMenu=0x7f07000c;
+        public static final int actionBtn=0x7f070004;
+        public static final int bulletImage=0x7f07000a;
+        public static final int exitMenu=0x7f07000d;
+        public static final int life1=0x7f070005;
+        public static final int life2=0x7f070006;
+        public static final int life3=0x7f070007;
+        public static final int newGameButton=0x7f070009;
+        public static final int settingsMenu=0x7f07000b;
+        public static final int space1=0x7f070002;
         public static final int tableRow1=0x7f070001;
-        public static final int tableRow2=0x7f070005;
+        public static final int tableRow2=0x7f070003;
     }
     public static final class layout {
         public static final int game=0x7f030000;
