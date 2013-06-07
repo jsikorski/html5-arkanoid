@@ -118,7 +118,7 @@ class Pad extends Model
 		if control.isLeftActive() and not @leftCollisionDetected
 			@move(-@speed * modifier, 0)
 
-		if control.isStartActive() and @canShoot
+		if control.isShootActive() and @canShoot
 			@game.shoot(@)
 			@canShoot = false
 

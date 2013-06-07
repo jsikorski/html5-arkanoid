@@ -10,6 +10,9 @@ class ControlHandler
 	isStartActive: ->
 		@activeMoves['start']?
 
+	isShootActive:->
+		@activeMoves['shoot']?
+		
 	reset: (stateName)->
 		delete @activeMoves[stateName]
 
@@ -18,7 +21,8 @@ class KeyboardHandler extends ControlHandler
 	keyboardMapping:
 		37: 'left'
 		39: 'right'
-		32: 'start'
+		13: 'start'
+		32: 'shoot'
 
 	constructor: ->
 		addEventListener('keydown', (e) => 
@@ -62,7 +66,7 @@ class ServerHandler extends ControlHandler
 		)
 		
 		webSocketClient.on("shoot", =>  
-			@activeMoves['start'] = true
+			@activeMoves['shoot'] = true
 		)
 		
 		webSocketClient.on("restart", =>
@@ -92,6 +96,9 @@ class Facade
 	isStartActive: ->
 		_.some(@controlHandlers, (handler) -> handler.isStartActive())
 
+	isShootActive: ->
+		_.some(@controlHandlers, (handler) -> handler.isShootActive())	
+		
 	reset: (stateName)->
 		handler.reset(stateName) for handler in @controlHandlers
 	

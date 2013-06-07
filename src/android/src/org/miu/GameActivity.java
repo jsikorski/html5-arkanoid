@@ -102,7 +102,10 @@ public class GameActivity extends Activity {
 						Log.d("Send", "Start");
 						server.pushStart();
 						started = true;
-						actionBtn.setImageResource(R.drawable.button);
+						if(shoots)
+							actionBtn.setImageResource(R.drawable.fire);
+						else
+							actionBtn.setImageResource(R.drawable.button);
 					}
 					else if(shoots){
 						Log.d("Send", "Shoot");
@@ -140,7 +143,6 @@ public class GameActivity extends Activity {
 				public void run() {
 			
 					if (server.isConnected()) {
-						
 						if(server.isforceFeedBack() && vibrate)
 							v.vibrate(150);
 						else if(server.isLifeLost())
