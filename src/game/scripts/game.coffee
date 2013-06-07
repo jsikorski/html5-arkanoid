@@ -88,7 +88,7 @@ class Game
 	looseLife: ->
 		@renderer.remove(@livesCounter.popLife())
 
-		@control.vibrate('looseLife')
+		@control.sendMessage('looseLife')
 		
 		if (!@livesCounter.isEmpty())
 
@@ -129,6 +129,7 @@ class Game
 
 		@renderer.remove(@pad)
 		@renderer.addElements(new Arkanoid.Graphics.Element(@pad, 'img/pad3.png'))
+		@control.sendMessage('powerup')
 
 	shoot: (pad) ->
 		@renderer.remove(@pad)
@@ -143,6 +144,6 @@ class Game
 		@renderer.addElements(new Arkanoid.Graphics.Element(bullet, 'img/bullet.png'))
 
 	hitPad: ->
-		@control.vibrate('force')
+		@control.sendMessage('force')
 
 exportForModule 'Arkanoid', Board, Game
