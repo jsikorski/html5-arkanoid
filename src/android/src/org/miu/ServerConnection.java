@@ -16,13 +16,10 @@ package org.miu;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Log;
 
 import com.codebutler.android_websockets.SocketIOClient;
 
@@ -37,7 +34,9 @@ public class ServerConnection {
 	private SocketIOClient client;
 	private boolean lifeLost = false;
 	private boolean forceFeedBack = false;
-	private final ReentrantLock lock = new ReentrantLock();
+	private boolean shoot = false;
+	
+	private String startMessage, leftMessage, rightMessage, resetMessage, restartMessage, shootMessage;
 
 	public boolean isLifeLost() {
 		if (lifeLost) {
@@ -50,6 +49,14 @@ public class ServerConnection {
 	public boolean isforceFeedBack() {
 		if (forceFeedBack) {
 			forceFeedBack = false;
+			return true;
+		} else
+			return false;
+	}
+	
+	public boolean isShootAvaible() {
+		if (shoot) {
+			shoot = false;
 			return true;
 		} else
 			return false;
@@ -75,7 +82,60 @@ public class ServerConnection {
 	 * @throws none
 	 */
 	public ServerConnection() {
-
+		try {
+		// Start the game
+			JSONArray arguments = new JSONArray();
+			JSONObject object = new JSONObject();
+			object.put("type", "start");
+			arguments.put(object);
+	        JSONObject event = new JSONObject();
+	        event.put("name", "message");
+	        event.put("args", arguments);
+	        
+	        startMessage = event.toString();
+	     // Move left   
+	        object.remove("type");
+			object.put("type", "move:left");
+			arguments.put(object);
+	        event.put("name", "message");
+	        event.put("args", arguments);	        
+	        
+	        leftMessage = event.toString();
+	     // Move right
+	        object.remove("type");
+			object.put("type", "move:right");
+			arguments.put(object);
+	        event.put("name", "message");
+	        event.put("args", arguments);	        
+	        
+	        rightMessage = event.toString();
+	     // Reset move
+	        object.remove("type");
+			object.put("type", "move:reset");
+			arguments.put(object);
+	        event.put("name", "message");
+	        event.put("args", arguments);	        
+	        
+	        resetMessage = event.toString();
+	     // Restart game
+	        object.remove("type");
+			object.put("type", "restart");
+			arguments.put(object);
+	        event.put("name", "message");
+	        event.put("args", arguments);	        
+	        
+	        restartMessage = event.toString();
+	     // Shoot
+	        object.remove("type");
+			object.put("type", "shoot");
+			arguments.put(object);
+	        event.put("name", "message");
+	        event.put("args", arguments);	        // Wiadomoœæ do serwera o wystrzale
+	        
+	        shootMessage = event.toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -119,18 +179,20 @@ public class ServerConnection {
 			client = new SocketIOClient(uri, new SocketIOClient.Handler() {
 
 				public void onConnect() {
-					Log.d(TAG, "Connected!");
 					isConnected = true;
+					client.emit(restartMessage);
 				}
 
 				public void on(String event, JSONArray arguments) {
 					try {
 						String arg = arguments.getJSONObject(0).getString("type").toString();
 
-						if (arg.equals("looseLife")) {
+						if (arg.equals("looseLife"))
 							lifeLost = true;
-						} else if (arg.equals("force"))
+						else if (arg.equals("force"))
 							forceFeedBack = true;
+						else if (arg.equals("shoot")) // Odebranie wiadomoœci od serwera o mo¿liwoœci strza³u
+							shoot = true;
 
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -138,23 +200,16 @@ public class ServerConnection {
 				}
 
 				public void onJSON(JSONObject json) {
-					Log.d(TAG,
-							String.format("Got JSON Object: %s",
-									json.toString()));
 				}
 
 				public void onMessage(String message) {
-					Log.d(TAG, String.format("Got message: %s", message));
 				}
 
 				public void onDisconnect(int code, String reason) {
-					Log.d(TAG, String.format(
-							"Disconnected! Code: %d Reason: %s", code, reason));
 					isConnected = false;
 				}
 
 				public void onError(Exception error) {
-					Log.e(TAG, "Error!", error);
 					isConnected = false;
 				}
 			});
@@ -173,27 +228,22 @@ public class ServerConnection {
 	 * @throws Connection
 	 *             error
 	 */
-	public boolean pushMove(String msg) {
-		if (isConnected) {
-			lock.lock();
-			try {
-				JSONArray arguments = new JSONArray();
-				JSONObject object = new JSONObject();
-				object.put("type", "move:" + msg);
-				arguments.put(object);
-				client.emit("message", arguments);
-			} catch (Exception e) {
-				Log.d(TAG, "Error sending JSON - MOVE");
-				return false;
-			} finally {
-				lock.unlock();
-			}
-
-			return true;
-		}
-		return false;
+	public boolean pushMoveLeft() {
+		client.emit(leftMessage);
+		return true;
 	}
-
+	public boolean pushMoveRight() {
+		client.emit(rightMessage);
+		return true;
+	}
+	public boolean pushMoveReset() {
+		client.emit(resetMessage);
+		return true;
+	}
+	public boolean pushShoot() {
+		client.emit(shootMessage);
+		return true;
+	}
 	/**
 	 * Push start JSON to server
 	 * 
@@ -203,21 +253,7 @@ public class ServerConnection {
 	 *             error
 	 */
 	public boolean pushStart() {
-		lock.lock();
-		try {
-			JSONArray arguments = new JSONArray();
-			JSONObject object = new JSONObject();
-			object.put("type", "start");
-			arguments.put(object);
-
-			client.emit("message", arguments);
-		} catch (Exception e) {
-			Log.d(TAG, "Error sending JSON - START");
-			return false;
-		} finally {
-			lock.unlock();
-		}
-
+		client.emit(startMessage);
 		return true;
 	}
 
@@ -230,14 +266,11 @@ public class ServerConnection {
 	 *             error
 	 */
 	public boolean disconnect() {
-		if (isConnected) {
-			try {
-				client.disconnect();
-			} catch (IOException e) {
-				Log.d("Disconnect error", e.getMessage());
-			}
-			return true;
+		try {
+			client.disconnect();
+		} catch (IOException e) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 }

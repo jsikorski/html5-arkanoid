@@ -13,9 +13,6 @@
 
 package org.miu;
 
-import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.miu.MySensor.Direction;
 
 import android.app.Activity;
@@ -26,12 +23,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -40,7 +37,7 @@ import android.widget.Toast;
  */
 public class GameActivity extends Activity {
 
-	private final static int INTERVAL = 10;
+	private final static int INTERVAL = 20;
 	private Vibrator v;
 	private MySensor g;
 	private ServerConnection server;
@@ -49,10 +46,11 @@ public class GameActivity extends Activity {
 	private Runnable runnable;
 	private boolean started = false;
 	private int lifes = 3;
+	private int shoots = 0;
 	private ImageView[] lifeImage;
 	private ImageButton actionBtn;
-	private final ReentrantLock lock = new ReentrantLock();
-
+	private boolean vibrate = false;
+	private TextView bullets;
 	/**
 	 * Called BackButton pressed
 	 * 
@@ -95,6 +93,7 @@ public class GameActivity extends Activity {
 		lifeImage[0] = (ImageView) findViewById(R.id.life1);
 		lifeImage[1] = (ImageView) findViewById(R.id.life2);
 		lifeImage[2] = (ImageView) findViewById(R.id.life3);
+		bullets = (TextView) findViewById(R.id.bulletsLabel);
 
 		v =  (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -106,44 +105,59 @@ public class GameActivity extends Activity {
 						started = true;
 						actionBtn.setImageResource(R.drawable.button);
 					}
+					else if(shoots > 0){
+						server.pushShoot();
+						shoots --;
+						bullets.setText(String.valueOf(shoots));
+						
+						if(shoots == 0)
+							actionBtn.setImageResource(R.drawable.button);
+					}
 				}
 			}
 		});
 
+	}
+	
+	@Override
+	public void onStart () {
+		super.onStart ();
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 
 		server = new ServerConnection();
 
+		vibrate = prefs.getBoolean("forcefeedback", false);
+		
 		final String ip = prefs.getString("adres", "192.168.1.1");
-		final String port = prefs.getString("port", "8080");
+		final String port = prefs.getString("port", "8080");		
 
 		server.connect(ip, port);
-
 		server.waitForConnection();
-
+		
 		if (server.isConnected()) {
 			g = new MySensor(this);
 
 			handler = new Handler();
 			runnable = new Runnable() {
 				public void run() {
+			
 					if (server.isConnected()) {
-							try {
-								if(server.isforceFeedBack())
-									v.vibrate(50);
-								else if(server.isLifeLost())
-									lifeLost();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
 						
+						if(server.isforceFeedBack() && vibrate)
+							v.vibrate(150);
+						else if(server.isLifeLost())
+							lifeLost();
+						else if(server.isShootAvaible())
+							addShoots();
+							
 						getDirection();
 						handler.postDelayed(this, INTERVAL);
+						
 					} else {
 						g.Stop();
 						finish();
-						toast("Po³¹czenie zerwane");
+						handler.removeCallbacks(runnable);
 					}
 				}
 			};
@@ -153,11 +167,17 @@ public class GameActivity extends Activity {
 			finish();
 		}
 	}
-
+	
 	private void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
+	
+	private void addShoots(){
+		shoots++;
+		bullets.setText(String.valueOf(shoots));
+		actionBtn.setImageResource(R.drawable.fire);
+	}
 	/**
 	 * Called when life is lost
 	 * 
@@ -165,9 +185,7 @@ public class GameActivity extends Activity {
 	 * @return void
 	 * @throws none
 	 */
-	private void lifeLost() throws IOException {
-		Log.d("LIFE LOST", "LIFE LOST");
-		
+	private void lifeLost() {		
 		if (lifes > 1) {
 			lifeImage[lifes - 1].setImageDrawable(null);
 			lifes--;
@@ -176,6 +194,14 @@ public class GameActivity extends Activity {
 		} else {
 			gameOver();
 			server.disconnect();
+		}
+		
+		if(vibrate){
+			int dot = 150; 
+			int gap = 50; 
+			long[] pattern = {0, dot, gap, dot, gap, dot};
+
+			v.vibrate(pattern, -1);
 		}
 	}
 
@@ -199,63 +225,17 @@ public class GameActivity extends Activity {
 	 */
 	private void getDirection() {
 		Direction get = g.getDirection();
-		try {
-			if (now != get) {
-				if (get == Direction.LEFT) {
-					now = Direction.LEFT;
-					goLeft();
-				} else if (get == Direction.RIGHT) {
-					now = Direction.RIGHT;
-					goRight();
-				} else {
-					now = Direction.NONE;
-					goStraight();
-				}
+		if (now != get) {
+			if (get == Direction.LEFT) {
+				now = Direction.LEFT;
+				server.pushMoveLeft();
+			} else if (get == Direction.RIGHT) {
+				now = Direction.RIGHT;
+				server.pushMoveRight();
+			} else {
+				now = Direction.NONE;
+				server.pushMoveReset();
 			}
-		} catch (Exception ex) {
-
 		}
-	}
-
-	/**
-	 * Called when turned left
-	 * 
-	 * @param void
-	 * @return void
-	 * @throws InterruptedException
-	 * @throws none
-	 */
-	private void goLeft() throws InterruptedException {
-		lock.lock();
-		server.pushMove("reset");
-		server.pushMove("left");
-		lock.unlock();
-	}
-
-	/**
-	 * Called when turned right
-	 * 
-	 * @param void
-	 * @return void
-	 * @throws InterruptedException
-	 * @throws none
-	 */
-	private void goRight() throws InterruptedException {
-		lock.lock();
-		server.pushMove("right");
-		lock.unlock();
-	}
-
-	/**
-	 * Called when not turned
-	 * 
-	 * @param void
-	 * @return void
-	 * @throws none
-	 */
-	private void goStraight() {
-		lock.lock();
-		server.pushMove("reset");
-		lock.unlock();
 	}
 }

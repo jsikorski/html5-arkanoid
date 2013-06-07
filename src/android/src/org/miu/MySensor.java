@@ -26,7 +26,7 @@ import android.hardware.SensorManager;
 public class MySensor implements SensorEventListener {
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
-	private final float bound = 4;
+	private final float bound = (float) 2.5;
 	private Direction dir = Direction.NONE;
 	private float axis = 0;
    

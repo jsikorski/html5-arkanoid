@@ -1,25 +1,74 @@
 package org.miu;
 
-import java.io.IOException;
+import io.socket.IOAcknowledge;
+import io.socket.IOCallback;
+import io.socket.SocketIO;
+import io.socket.SocketIOException;
+
+import java.net.MalformedURLException;
 import java.sql.Connection;
-import java.util.concurrent.locks.ReentrantLock;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Log;
-import de.tavendo.autobahn.WebSocketConnection;
-import de.tavendo.autobahn.WebSocketException;
-import de.tavendo.autobahn.WebSocketHandler;
 
 public class ServerConnectionAB {
 	protected static final String TAG = "ServerConnectionAB.java";
 	private static boolean isConnected = false;
-	private WebSocketConnection client = new WebSocketConnection();;
-	private JSONObject jsonMessage = null;
-	private final ReentrantLock lock = new ReentrantLock();
+	private SocketIO client;
+	private boolean lifeLost = false;
+	private boolean forceFeedBack = false;
+	
+	private JSONObject startMessage, leftMessage, rightMessage, resetMessage;
 
-	public JSONObject getMessag() {
-		return jsonMessage;
+	public boolean isLifeLost() {
+		if (lifeLost) {
+			lifeLost = false;
+			return true;
+		} else
+			return false;
+	}
+
+	public boolean isforceFeedBack() {
+		if (forceFeedBack) {
+			forceFeedBack = false;
+			return true;
+		} else
+			return false;
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param String
+	 *            (adres of server)
+	 * @return void
+	 * @throws none
+	 */
+	public ServerConnectionAB() {
+		try {
+			JSONObject object = new JSONObject();
+			object.put("type", "start");
+	        startMessage = object;  
+
+	        object = null;
+	        object = new JSONObject();
+			object.put("type", "move:left");       
+	        leftMessage = object;
+	        
+	        object = null;
+	        object = new JSONObject();
+			object.put("type", "move:right");
+	        rightMessage = object;
+	        
+	        object = null;
+	        object = new JSONObject();
+			object.put("type", "move:reset");
+			resetMessage = object;
+	        
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
      * Returns true if connection established
@@ -62,93 +111,106 @@ public class ServerConnectionAB {
      * @throws Connection error
      */
 	public void connect(String ip, String port) {
-	      final String wsuri = "ws:////"+ip+":"+port;
-	      
-	      try {
-	    	  client.connect(wsuri, new WebSocketHandler() {
-	 
-	            @Override
-	            public void onOpen() {
-	               Log.d(TAG, "Status: Connected to " + wsuri);
-	               client.sendTextMessage("Hello, world!");
-	            }
-	 
-	            @Override
-	            public void onTextMessage(String payload) {
-	               Log.d(TAG, "Got echo: " + payload);
-	            }
-	 
-	            @Override
-	            public void onClose(int code, String reason) {
-	               Log.d(TAG, "Connection lost.");
-	            }
-	         });
-	      } catch (WebSocketException e) {
-	 
-	         Log.d(TAG, e.toString());
-	      }
-	}
-	/**
-     * Push move to server
-     *
-     * @param  String (message)
-     * @return boolean (true if pushed)
-     * @throws Connection error
-     */
-	public boolean pushMove(String msg) {
-		if(isConnected) {
-			lock.lock();
-			try {
-				String message = "5:::{\"name\":\"message\",\"args\":[{\"type\"move:" + msg + "\"}]}";
-				
-				client.sendTextMessage(message);
-			} catch (Exception e) {
-				Log.d(TAG, "Error sending JSON - MOVE");
-				return false;
-			} finally {
-				lock.unlock();
-			}
-			
-			return true;
-		}
-		return false;	
-	}
-	
-	/**
-	 * Push start JSON to server
-	 *
-	 * @param  void
-	 * @return boolean (true if pushed)
-	 * @throws Connection error
-	 */	
-	public boolean pushStart() {
-		lock.lock();
 		try {
-			String message = "5:::{\"name\":\"message\",\"args\":[{\"type\"start\"}]}";
-			
-			client.sendTextMessage(message);
-		} catch (Exception e) {
-			Log.d(TAG, "Error sending JSON - START");
-			return false;
-		} finally {
-			lock.unlock();
+			client = new SocketIO("http://"+ip+":"+port);
+
+			client.connect(new IOCallback() {
+            @Override
+            public void onMessage(JSONObject json, IOAcknowledge ack) {
+                try {
+                    JSONArray arguments = json.getJSONArray("message");
+					try {
+						String arg = arguments.getJSONObject(0).getString("type").toString();
+
+						if (arg.equals("looseLife")) {
+							lifeLost = true;
+						} else if (arg.equals("force"))
+							forceFeedBack = true;
+
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onMessage(String data, IOAcknowledge ack) {
+                System.out.println("Server said: " + data);
+            }
+
+            @Override
+            public void onError(SocketIOException socketIOException) {
+                System.out.println("an Error occured");
+                socketIOException.printStackTrace();
+            }
+
+            @Override
+            public void onDisconnect() {
+            	isConnected = false;
+                System.out.println("Connection terminated.");
+            }
+
+            @Override
+            public void onConnect() {
+            	isConnected = true;
+                System.out.println("Connection established");
+            }
+
+            @Override
+            public void on(String event, IOAcknowledge ack, Object... args) {
+                System.out.println("Server triggered event '" + event + "'");
+            }
+        });
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
 		}
-		
+	}
+	/**
+	 * Push move to server
+	 * 
+	 * @param String
+	 *            (message)
+	 * @return boolean (true if pushed)
+	 * @throws Connection
+	 *             error
+	 */
+	public boolean pushMoveLeft() {
+		client.send(leftMessage);
 		return true;
 	}
-	
+	public boolean pushMoveRight() {
+		client.send(rightMessage);
+		return true;
+	}
+	public boolean pushMoveReset() {
+		client.send(resetMessage);
+		return true;
+	}
+	/**
+	 * Push start JSON to server
+	 * 
+	 * @param void
+	 * @return boolean (true if pushed)
+	 * @throws Connection
+	 *             error
+	 */
+	public boolean pushStart() {
+		client.send(startMessage);
+		return true;
+	}
+
 	/**
 	 * Disconnect from server
-	 *
-	 * @param  void
+	 * 
+	 * @param void
 	 * @return boolean (true if disconnected)
-	 * @throws Connection error
-	 */		
-	public boolean disconnect() throws IOException {
-		if(isConnected) {
-			client.disconnect();
-			return true;
-		}
-		return false;
+	 * @throws Connection
+	 *             error
+	 */
+	public boolean disconnect() {
+		client.disconnect();
+		return true;
 	}
 }

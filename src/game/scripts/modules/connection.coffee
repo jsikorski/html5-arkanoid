@@ -8,7 +8,6 @@ class WebSocketClient
 	handleMessage: (message, callback) =>
 		messageType = message.type
 		handler.callback(message) for handler in @handlers when handler.messageType is messageType
-		#console.log message
 		#console.log message.type
 		
 	on: (messageType, callback) ->

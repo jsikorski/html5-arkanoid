@@ -11,8 +11,15 @@
         android:layout_height="wrap_content"
         android:padding="5dip" >
 
+        <ImageView
+            android:id="@+id/bulletImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bullet" 
+            android:contentDescription="@+string/contentText" />
+
         <TextView
-            android:id="@+id/pointsLabel"
+            android:id="@+id/bulletsLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pointsLabelText"
@@ -31,13 +38,6 @@
         android:layout_height="wrap_content"
         android:padding="5dip" >
 
-    	<ImageView
-    	    android:id="@+id/arrowLeft"
-    	    android:layout_width="100dip"
-    	    android:layout_height="100dip"
-    	    android:contentDescription="@+string/contentText"
-    	    android:src="@drawable/arrow_off" />
-
     	<ImageButton
         	android:id="@+id/actionBtn"
         	android:layout_width="0dip"
@@ -46,13 +46,6 @@
         	android:background="@null"
         	android:src="@drawable/start_btn"
         	android:contentDescription="@+string/contentText" />
-
-    	<ImageView
-    	    android:id="@+id/arrowRight"
-    	    android:layout_width="100dip"
-    	    android:layout_height="100dip"
-    	    android:contentDescription="@+string/contentText"
-    	    android:src="@drawable/arrow_off" />
 
     </TableRow>
 

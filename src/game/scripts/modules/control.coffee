@@ -61,7 +61,7 @@ class ServerHandler extends ControlHandler
 			@reset('right')
 		)
 
-		webSocketClient.on("restart", =>  
+		webSocketClient.on("restart", =>
 			location.reload()
 		)
 

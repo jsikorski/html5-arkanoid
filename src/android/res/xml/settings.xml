@@ -17,14 +17,7 @@
  <PreferenceCategory
    android:summary="Ustawienia gry"
    android:title="Ustawienia gry" >
-  <CheckBoxPreference
-    android:key="sound"
-    android:title="Dźwięk"
-    android:defaultValue="true" />
-   <CheckBoxPreference
-    android:key="vibrate"
-    android:title="Wibracje"
-    android:defaultValue="true" />
+   
    <CheckBoxPreference
     android:key="forcefeedback"
     android:title="ForceFeedback"

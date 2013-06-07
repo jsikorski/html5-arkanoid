@@ -10,10 +10,10 @@ class Mediator
 	
 	forewardMessage: (message, sender) ->	
 		if sender == "Android"
-			console.log message.type
+			#console.log message.type
 			@htmlConnector.forewardMessage(message)
 		else if sender == "Html"
-			console.log message.type
+			#console.log message.type
 			@androidConnector.forewardMessage(message)
 	
 class AndroidConnector

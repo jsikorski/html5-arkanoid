@@ -92,12 +92,12 @@ public class SocketIOClient {
     }
     
     public void emit(final String message) {
-        mSendHandler.post(new Runnable() {
+        //mSendHandler.post(new Runnable() {
             
-            public void run() {
-                mClient.send(String.format("3:::%s", message));
-            }
-        });
+        //    public void run() {
+                mClient.send(String.format("5:::%s", message));
+        //    }
+        //});
     }
     
     public void emit(final JSONObject jsonMessage) {
@@ -218,7 +218,7 @@ public class SocketIOClient {
             public void onDisconnect(int code, String reason) {
                 cleanup();
                 // attempt reconnect with same session?
-                mHandler.onDisconnect(code, reason);
+                //mHandler.onDisconnect(code, reason);
             }
 
             public void onConnect() {
