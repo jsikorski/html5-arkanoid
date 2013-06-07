@@ -65,7 +65,7 @@ class ServerHandler extends ControlHandler
 			location.reload()
 		)
 
-	vibrate: (message) ->
+	sendMessage: (message) ->
 		@webSocketClient.send(message)
 
 
